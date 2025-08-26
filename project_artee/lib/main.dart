@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:project_artee/model/post.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
+import 'package:project_artee/page/home_page.dart';
 import 'package:project_artee/page/menu_page.dart';
 import 'package:project_artee/page/post_page.dart';
 import 'package:project_artee/page/publish.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MenuPage(),
+      home: HomePage(),
     );
   }
 }
