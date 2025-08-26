@@ -4,7 +4,6 @@ import 'package:project_artee/model/post.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/home_page.dart';
 import 'package:project_artee/page/menu_page.dart';
-import 'package:project_artee/page/post_page.dart';
 import 'package:project_artee/page/publish.dart';
 import 'package:project_artee/views/home_view.dart';
 import 'package:project_artee/page/food_statuspage.dart';

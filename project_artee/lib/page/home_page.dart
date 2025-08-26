@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_artee/services/menu_api.dart';
+import 'package:project_artee/page/publish.dart';
+import 'package:project_artee/views/login_view.dart';
+import 'menu_page.dart'; // import หน้าเมนูที่คุณเขียนไว้
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,88 +11,76 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic> menus = [];
-  bool loading = true;
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    loadMenus();
+  // กำหนดหน้าที่จะใช้ใน HomePage (5 หน้า)
+  final List<Widget> _pages = [
+    const PostsPage(), // หน้าโพสต์
+    const MenuPage(), // หน้าเมนู
+    const Center(child: Text("👤 โปรไฟล์", style: TextStyle(fontSize: 20))),
+    const Center(child: Text("🔔 ยกเลิก", style: TextStyle(fontSize: 20))),
+    const Center(child: Text("⚙️ การตั้งค่า", style: TextStyle(fontSize: 20))),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  Future<void> loadMenus() async {
-    try {
-      final data = await MenuService.fetchMenus();
-      setState(() {
-        menus = data;
-        loading = false;
-      });
-    } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
-    }
-  }
-
-  Future<void> toggleAvailability(int menuID, bool newValue) async {
-    try {
-      await MenuService.updateAvailability(menuID, newValue);
-      setState(() {
-        final index = menus.indexWhere((m) => m['menuID'] == menuID);
-        if (index != -1) {
-          menus[index]['isAvailable'] = newValue;
-        }
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Updated menu #$menuID")));
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Update failed: $e")));
-    }
+  void _logout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Logout'),
+            content: const Text('คุณต้องการออกจากระบบหรือไม่?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(), // ยกเลิก
+                child: const Text('ยกเลิก'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog ก่อน
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginView()),
+                  );
+                },
+                child: const Text('ตกลง'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text("เมนูอาหาร")),
-      body:
-          menus.isEmpty
-              ? const Center(child: Text("ไม่มีเมนู"))
-              : ListView.builder(
-                itemCount: menus.length,
-                itemBuilder: (context, index) {
-                  final menu = menus[index];
-                  return Card(
-                    margin: const EdgeInsets.all(8),
-                    child: ListTile(
-                      leading: Image.network(
-                        menu['image'] ?? "",
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (context, error, stackTrace) =>
-                                const Icon(Icons.fastfood),
-                      ),
-                      title: Text(menu['name'] ?? ""),
-                      subtitle: Text("ราคา: ${menu['price']} บาท"),
-                      trailing: Switch(
-                        value: menu['isAvailable'] == true,
-                        onChanged:
-                            (value) =>
-                                toggleAvailability(menu['menuID'], value),
-                      ),
-                    ),
-                  );
-                },
-              ),
+      appBar: AppBar(
+        title: const Text("Restaurant Dashboard"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          ),
+        ],
+      ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, // ✅ ต้องใส่ถ้าเกิน 3 item
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Dashboard"),
+          BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "เมนู"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
+          BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "ยกเลิก"),
+          BottomNavigationBarItem(icon: Icon(Icons.payment), label: "ชำระเงิน"),
+        ],
+      ),
     );
   }
 }

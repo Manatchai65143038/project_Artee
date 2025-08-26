@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_artee/page/home_page.dart';
 import 'package:project_artee/views/home_view.dart';
 import 'package:project_artee/views/register.dart';
 import 'package:http/http.dart' as http;
@@ -29,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
     if (_formKey.currentState!.validate()) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeView()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     }
   }
