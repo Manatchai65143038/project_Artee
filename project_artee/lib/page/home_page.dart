@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project_artee/page/cancel_order_page.dart';
+import 'package:project_artee/page/confirm_payment_page.dart';
+import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
+import 'package:project_artee/page/profile_page.dart';
 import 'package:project_artee/page/publish.dart';
+import 'package:project_artee/services/genarate_qr_api.dart';
 import 'package:project_artee/views/login_view.dart';
 import 'menu_page.dart'; // import หน้าเมนูที่คุณเขียนไว้
 
@@ -18,10 +23,10 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const MenuTablePage(), // หน้าตารางเมนู
     const MenuPage(), // หน้าเมนู
-    const Center(child: Text("📸 Qr Code", style: TextStyle(fontSize: 20))),
-    const Center(child: Text("👤 โปรไฟล์", style: TextStyle(fontSize: 20))),
-    const Center(child: Text("📋 ยกเลิก", style: TextStyle(fontSize: 20))),
-    const Center(child: Text("💸 ชำระเงิน", style: TextStyle(fontSize: 20))),
+    const GenerateQrPage(), // หน้าสร้างและแชร์ QR Code
+    const ProfilePage(), // หน้าโปรไฟล์
+    const CancelOrderPage(), // หน้ายกเลิกออเดอร์
+    const ConfirmPaymentPage(), // หน้ายืนยันการชำระเงิน
   ];
 
   void _onItemTapped(int index) {

@@ -33,7 +33,6 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
   Future<void> _saveQR() async {
     if (_qrData.isEmpty) return;
     final directory = await getApplicationDocumentsDirectory();
-
     final filePath = "${directory.path}/qrcode.png";
 
     final image = await _screenshotController.capture();
@@ -67,8 +66,10 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // ✅ ป้องกัน overflow
       appBar: AppBar(title: const Text("Generate & Share QR Code")),
-      body: Padding(
+      body: SingleChildScrollView(
+        // ✅ หุ้มด้วย scroll
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
