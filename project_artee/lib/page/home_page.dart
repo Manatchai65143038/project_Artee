@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed, // ✅ ต้องใส่ถ้าเกิน 3 item
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "หนเาหลัก"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "หน้าหลัก"),
           BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "เมนู"),
           BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: "QR Code"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
