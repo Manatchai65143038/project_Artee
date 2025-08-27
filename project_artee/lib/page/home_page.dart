@@ -18,9 +18,10 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const MenuTablePage(), // หน้าตารางเมนู
     const MenuPage(), // หน้าเมนู
+    const Center(child: Text("📸 Qr Code", style: TextStyle(fontSize: 20))),
     const Center(child: Text("👤 โปรไฟล์", style: TextStyle(fontSize: 20))),
     const Center(child: Text("📋 ยกเลิก", style: TextStyle(fontSize: 20))),
-    const Center(child: Text("⚙️ การตั้งค่า", style: TextStyle(fontSize: 20))),
+    const Center(child: Text("💸 ชำระเงิน", style: TextStyle(fontSize: 20))),
   ];
 
   void _onItemTapped(int index) {
@@ -77,6 +78,7 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "หนเาหลัก"),
           BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "เมนู"),
+          BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: "QR Code"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
           BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "ยกเลิก"),
           BottomNavigationBarItem(icon: Icon(Icons.payment), label: "ชำระเงิน"),
