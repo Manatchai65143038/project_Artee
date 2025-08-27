@@ -25,6 +25,7 @@ class _MenuPageState extends State<MenuPage> {
         menus = data;
         loading = false;
       });
+      print(data);
     } catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(
