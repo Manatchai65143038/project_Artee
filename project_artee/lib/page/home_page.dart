@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   // กำหนดหน้าที่จะใช้ใน HomePage (5 หน้า)
   final List<Widget> _pages = [
-    const PostsPage(), // หน้าโพสต์
+    const Center(child: Text("👤 หน้าหลัก", style: TextStyle(fontSize: 20))),
     const MenuPage(), // หน้าเมนู
     const Center(child: Text("👤 โปรไฟล์", style: TextStyle(fontSize: 20))),
     const Center(child: Text("🔔 ยกเลิก", style: TextStyle(fontSize: 20))),
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Restaurant Dashboard"),
+        title: const Text("Restaurant Artee"),
         centerTitle: true,
         actions: [
           IconButton(
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed, // ✅ ต้องใส่ถ้าเกิน 3 item
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Dashboard"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "หนเาหลัก"),
           BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "เมนู"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
           BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "ยกเลิก"),
