@@ -21,8 +21,8 @@ class _HomePageState extends State<HomePage> {
 
   // กำหนดหน้าที่จะใช้ใน HomePage (5 หน้า)
   final List<Widget> _pages = [
-    const MenuTablePage(), // หน้าตารางเมนู
-    const MenuPage(), // หน้าเมนู
+    const MenuTablePage(), // หน้าตารางเมนู api
+    const MenuPage(), // หน้าเมนู api
     const GenerateQrPage(), // หน้าสร้างและแชร์ QR Code
     const ProfilePage(), // หน้าโปรไฟล์
     const CancelOrderPage(), // หน้ายกเลิกออเดอร์
