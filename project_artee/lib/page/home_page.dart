@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_artee/page/menu_table_page.dart';
 import 'package:project_artee/page/publish.dart';
 import 'package:project_artee/views/login_view.dart';
 import 'menu_page.dart'; // import หน้าเมนูที่คุณเขียนไว้
@@ -15,10 +16,10 @@ class _HomePageState extends State<HomePage> {
 
   // กำหนดหน้าที่จะใช้ใน HomePage (5 หน้า)
   final List<Widget> _pages = [
-    const Center(child: Text("👤 หน้าหลัก", style: TextStyle(fontSize: 20))),
+    const MenuTablePage(), // หน้าตารางเมนู
     const MenuPage(), // หน้าเมนู
     const Center(child: Text("👤 โปรไฟล์", style: TextStyle(fontSize: 20))),
-    const Center(child: Text("🔔 ยกเลิก", style: TextStyle(fontSize: 20))),
+    const Center(child: Text("📋 ยกเลิก", style: TextStyle(fontSize: 20))),
     const Center(child: Text("⚙️ การตั้งค่า", style: TextStyle(fontSize: 20))),
   ];
 
