@@ -13,7 +13,6 @@ class MenuService {
     } else {
       throw Exception("Failed to load menus");
     }
-    print(response.body);
   }
 
   /// อัพเดตค่า isAvailable ของเมนู
