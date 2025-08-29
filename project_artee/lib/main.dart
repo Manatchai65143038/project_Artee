@@ -7,7 +7,6 @@ import 'package:project_artee/page/menu_page.dart';
 import 'package:project_artee/page/publish.dart';
 import 'package:project_artee/page/food_statuspage.dart';
 import 'package:project_artee/views/login_view.dart';
-import 'package:project_artee/views/register.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
 
 void main() {
