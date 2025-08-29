@@ -12,11 +12,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
   List<Map<String, dynamic>> cancelLogs = [];
   bool loading = true;
 
-  final TextEditingController detailNoController = TextEditingController();
-  final TextEditingController orderNoController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController cancelByController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -26,83 +21,18 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
   Future<void> loadCancelLogs() async {
     try {
       final data = await CancelOrderService.fetchCancelLogs();
+      if (!mounted) return;
       setState(() {
         cancelLogs = List<Map<String, dynamic>>.from(data);
         loading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => loading = false);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("โหลดข้อมูลล้มเหลว: $e")));
     }
-  }
-
-  Future<void> addCancelLog() async {
-    try {
-      await CancelOrderService.addCancelLog(
-        detailNo: int.parse(detailNoController.text),
-        orderNo: int.parse(orderNoController.text),
-        description: descriptionController.text,
-        cancelBy: cancelByController.text,
-      );
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("เพิ่มการยกเลิกสำเร็จ")));
-      loadCancelLogs(); // refresh
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("เพิ่มการยกเลิกไม่สำเร็จ: $e")));
-    }
-  }
-
-  void openAddDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text("ยกเลิกออเดอร์"),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    controller: detailNoController,
-                    decoration: const InputDecoration(labelText: "Detail No"),
-                    keyboardType: TextInputType.number,
-                  ),
-                  TextField(
-                    controller: orderNoController,
-                    decoration: const InputDecoration(labelText: "Order No"),
-                    keyboardType: TextInputType.number,
-                  ),
-                  TextField(
-                    controller: descriptionController,
-                    decoration: const InputDecoration(labelText: "รายละเอียด"),
-                  ),
-                  TextField(
-                    controller: cancelByController,
-                    decoration: const InputDecoration(labelText: "ผู้ยกเลิก"),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("ยกเลิก"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  addCancelLog();
-                  Navigator.pop(context);
-                },
-                child: const Text("บันทึก"),
-              ),
-            ],
-          ),
-    );
   }
 
   @override
@@ -140,10 +70,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
                   );
                 },
               ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: openAddDialog,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

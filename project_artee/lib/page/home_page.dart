@@ -14,25 +14,43 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
 
-  final List<Widget> _pages = [
-    const MenuTablePage(), // เปลี่ยนเป็น MenuTablePage
-    const MenuPage(), // เปลี่ยนเป็น MenuPage
-    const GenerateQrPage(), // เปลี่ยนเป็น GenerateQrPage
-    const StaffPage(), // เปลี่ยนเป็น ProfilePage
-    const CancelOrderPage(), // เปลี่ยนเป็น CancelOrderPage
-    const ConfirmPaymentPage(), // เปลี่ยนเป็น ConfirmPaymentPage
+  final List<String> _tabTitles = [
+    "หน้าหลัก",
+    "เมนู",
+    "QR Code",
+    "โปรไฟล์",
+    "ยกเลิก",
+    "ชำระเงิน",
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  final List<IconData> _tabIcons = [
+    Icons.home,
+    Icons.fastfood,
+    Icons.qr_code,
+    Icons.person,
+    Icons.cancel,
+    Icons.payment,
+  ];
+
+  final List<Widget> _pages = const [
+    MenuTablePage(),
+    MenuPage(),
+    GenerateQrPage(),
+    StaffPage(),
+    CancelOrderPage(),
+    ConfirmPaymentPage(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _pages.length, vsync: this);
   }
 
-  // ออกจากระบบ
   void _logout(BuildContext context) {
     showDialog(
       context: context,
@@ -60,9 +78,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ออกจากระบบ
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 600; // กำหนด breakpoint
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Restaurant Artee"),
@@ -73,46 +99,50 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => _logout(context),
           ),
         ],
+        bottom:
+            isDesktop
+                ? null
+                : TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabs: List.generate(
+                    _tabTitles.length,
+                    (index) => Tab(
+                      text: _tabTitles[index],
+                      icon: Icon(_tabIcons[index]),
+                    ),
+                  ),
+                ),
       ),
-      body: Row(
-        children: [
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onItemTapped,
-            labelType: NavigationRailLabelType.all, // โชว์ label ตลอด
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text("หน้าหลัก"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.fastfood),
-                label: Text("เมนู"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.qr_code),
-                label: Text("QR Code"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.person),
-                label: Text("โปรไฟล์"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.cancel),
-                label: Text("ยกเลิก"),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.payment),
-                label: Text("ชำระเงิน"),
-              ),
-            ],
-          ),
-          const VerticalDivider(thickness: 1, width: 1), // เส้นแบ่ง
-          Expanded(
-            child: _pages[_selectedIndex], // เนื้อหาหน้า
-          ),
-        ],
-      ),
+      body:
+          isDesktop
+              ? Row(
+                children: [
+                  NavigationRail(
+                    selectedIndex: _tabController.index,
+                    onDestinationSelected:
+                        (index) => setState(() {
+                          _tabController.index = index;
+                        }),
+                    labelType: NavigationRailLabelType.all,
+                    destinations: List.generate(
+                      _tabTitles.length,
+                      (index) => NavigationRailDestination(
+                        icon: Icon(_tabIcons[index]),
+                        label: Text(_tabTitles[index]),
+                      ),
+                    ),
+                  ),
+                  const VerticalDivider(thickness: 1, width: 1),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: _pages,
+                    ),
+                  ),
+                ],
+              )
+              : TabBarView(controller: _tabController, children: _pages),
     );
   }
 }
