@@ -17,8 +17,6 @@ class StaffService {
     required String name,
     required String surname,
     required String telNo,
-    required String username,
-    required String password,
     String? image,
     String? fileID,
   }) async {
@@ -29,8 +27,6 @@ class StaffService {
         "name": name,
         "surname": surname,
         "telNo": telNo,
-        "username": username,
-        "password": password,
         "image": image ?? "",
         "fileID": fileID ?? "",
       }),
