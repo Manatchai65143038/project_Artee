@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_artee/page/cancel_order_page.dart';
 import 'package:project_artee/page/food_statuspage.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
-import 'package:project_artee/page/profile_page.dart';
+import 'package:project_artee/page/staff_page.dart';
 import 'package:project_artee/views/login_view.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
 
@@ -78,7 +78,7 @@ class HomeView extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  MaterialPageRoute(builder: (context) => const StaffPage()),
                 );
               },
             ),

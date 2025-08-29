@@ -3,7 +3,7 @@ import 'package:project_artee/page/cancel_order_page.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
-import 'package:project_artee/page/profile_page.dart';
+import 'package:project_artee/page/staff_page.dart';
 import 'package:project_artee/views/login_view.dart';
 import 'menu_page.dart';
 
@@ -18,12 +18,12 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const MenuTablePage(),
-    const MenuPage(),
-    const GenerateQrPage(),
-    const ProfilePage(),
-    const CancelOrderPage(),
-    const ConfirmPaymentPage(),
+    const MenuTablePage(), // เปลี่ยนเป็น MenuTablePage
+    const MenuPage(), // เปลี่ยนเป็น MenuPage
+    const GenerateQrPage(), // เปลี่ยนเป็น GenerateQrPage
+    const StaffPage(), // เปลี่ยนเป็น ProfilePage
+    const CancelOrderPage(), // เปลี่ยนเป็น CancelOrderPage
+    const ConfirmPaymentPage(), // เปลี่ยนเป็น ConfirmPaymentPage
   ];
 
   void _onItemTapped(int index) {
@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // ออกจากระบบ
   void _logout(BuildContext context) {
     showDialog(
       context: context,
@@ -59,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // ออกจากระบบ
   @override
   Widget build(BuildContext context) {
     return Scaffold(
