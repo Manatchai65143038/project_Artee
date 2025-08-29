@@ -21,11 +21,13 @@ class _StaffPageState extends State<StaffPage> {
   Future<void> loadStaffs() async {
     try {
       final data = await StaffService.fetchStaffs();
+      if (!mounted) return; // ✅ ป้องกัน setState หลัง dispose
       setState(() {
         staffs = data;
         loading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => loading = false);
       ScaffoldMessenger.of(
         context,
@@ -33,18 +35,19 @@ class _StaffPageState extends State<StaffPage> {
     }
   }
 
-  void openAddDialog() {
-    final nameController = TextEditingController();
-    final surnameController = TextEditingController();
-    final telController = TextEditingController();
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
+  // เพิ่ม/แก้ไข Staff
+  void openStaffDialog({Map<String, dynamic>? staff}) {
+    final nameController = TextEditingController(text: staff?['name']);
+    final surnameController = TextEditingController(text: staff?['surname']);
+    final telController = TextEditingController(text: staff?['telNo']);
+    final usernameController = TextEditingController(text: staff?['username']);
+    final passwordController = TextEditingController(text: staff?['password']);
 
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("เพิ่ม Staff"),
+            title: Text(staff == null ? "เพิ่ม Staff" : "แก้ไข Staff"),
             content: SingleChildScrollView(
               child: Column(
                 children: [
@@ -78,21 +81,55 @@ class _StaffPageState extends State<StaffPage> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await StaffService.addStaff(
-                    name: nameController.text,
-                    surname: surnameController.text,
-                    telNo: telController.text,
-                    username: usernameController.text,
-                    password: passwordController.text,
-                  );
-                  Navigator.pop(context);
-                  loadStaffs();
+                  try {
+                    if (staff == null) {
+                      // เพิ่ม Staff
+                      await StaffService.addStaff(
+                        name: nameController.text,
+                        surname: surnameController.text,
+                        telNo: telController.text,
+                        username: usernameController.text,
+                        password: passwordController.text,
+                      );
+                    } else {
+                      // แก้ไข Staff
+                      await StaffService.updateStaff(staff['staffID'], {
+                        "name": nameController.text,
+                        "surname": surnameController.text,
+                        "telNo": telController.text,
+                        "username": usernameController.text,
+                        "password": passwordController.text,
+                      });
+                    }
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    loadStaffs();
+                  } catch (e) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("เกิดข้อผิดพลาด: $e")),
+                    );
+                  }
                 },
                 child: const Text("บันทึก"),
               ),
             ],
           ),
     );
+  }
+
+  // ลบ Staff
+  void deleteStaff(int id) async {
+    try {
+      await StaffService.deleteStaff(id);
+      if (!mounted) return;
+      loadStaffs();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("ลบ Staff ไม่สำเร็จ: $e")));
+    }
   }
 
   @override
@@ -103,7 +140,10 @@ class _StaffPageState extends State<StaffPage> {
       appBar: AppBar(
         title: const Text("Staff"),
         actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: openAddDialog),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => openStaffDialog(),
+          ),
         ],
       ),
       body:
@@ -120,12 +160,18 @@ class _StaffPageState extends State<StaffPage> {
                       subtitle: Text(
                         "Username: ${s['username']} | Tel: ${s['telNo']}",
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await StaffService.deleteStaff(s['staffID']);
-                          loadStaffs();
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => openStaffDialog(staff: s),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => deleteStaff(s['staffID']),
+                          ),
+                        ],
                       ),
                     ),
                   );
