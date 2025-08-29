@@ -9,17 +9,25 @@ class RegisterView extends StatefulWidget {
 
 class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   Future sign_up() async {
+    // TODO: Call API register ที่ backend ของคุณ
     String url = "";
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -27,17 +35,28 @@ class _RegisterViewState extends State<RegisterView> {
 
   void _register() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Call your registration method here
+      // ✅ ส่งข้อมูลไป backend หรือ API
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("สมัครสมาชิกเรียบร้อย ✅")));
     }
   }
 
-  String? _validateEmail(String? value) {
+  // ✅ Validation
+  String? _validateNotEmpty(String? value, String field) {
     if (value == null || value.isEmpty) {
-      return 'กรุณากรอกอีเมล';
+      return 'กรุณากรอก$field';
     }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) {
-      return 'รูปแบบอีเมลไม่ถูกต้อง';
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'กรุณากรอกเบอร์โทร';
+    }
+    final phoneRegex = RegExp(r'^[0-9]{9,10}$');
+    if (!phoneRegex.hasMatch(value)) {
+      return 'เบอร์โทรไม่ถูกต้อง';
     }
     return null;
   }
@@ -77,17 +96,57 @@ class _RegisterViewState extends State<RegisterView> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(height: 32),
+
+                // ชื่อ
                 TextFormField(
-                  controller: _emailController,
+                  controller: _firstNameController,
                   decoration: const InputDecoration(
-                    labelText: 'อีเมล',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    labelText: 'ชื่อ',
+                    prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: _validateEmail,
+                  validator: (v) => _validateNotEmpty(v, "ชื่อ"),
                 ),
                 const SizedBox(height: 16),
+
+                // นามสกุล
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'นามสกุล',
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => _validateNotEmpty(v, "นามสกุล"),
+                ),
+                const SizedBox(height: 16),
+
+                // เบอร์โทร
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'เบอร์โทร',
+                    prefixIcon: Icon(Icons.phone_android),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: _validatePhone,
+                ),
+                const SizedBox(height: 16),
+
+                // Username
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    prefixIcon: Icon(Icons.account_circle_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => _validateNotEmpty(v, "Username"),
+                ),
+                const SizedBox(height: 16),
+
+                // Password
                 TextFormField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
@@ -99,6 +158,8 @@ class _RegisterViewState extends State<RegisterView> {
                   validator: _validatePassword,
                 ),
                 const SizedBox(height: 16),
+
+                // Confirm Password
                 TextFormField(
                   controller: _confirmPasswordController,
                   decoration: const InputDecoration(
@@ -110,6 +171,8 @@ class _RegisterViewState extends State<RegisterView> {
                   validator: _validateConfirmPassword,
                 ),
                 const SizedBox(height: 32),
+
+                // ปุ่มสมัครสมาชิก
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(

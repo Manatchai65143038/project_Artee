@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_artee/services/cancel_order_api.dart';
 
 class CancelOrderPage extends StatefulWidget {
   const CancelOrderPage({super.key});
@@ -8,52 +9,96 @@ class CancelOrderPage extends StatefulWidget {
 }
 
 class _CancelOrderPageState extends State<CancelOrderPage> {
-  List<Map<String, dynamic>> orders = [
-    {
-      'id': 'ORD001',
-      'table': 'โต๊ะ 1',
-      'items': ['โจ๊ก', 'น้ำส้ม'],
-      'status': 'กำลังเตรียมอาหาร',
-    },
-    {
-      'id': 'ORD002',
-      'table': 'โต๊ะ 3',
-      'items': ['ข้าวผัด', 'โค้ก'],
-      'status': 'รอเสิร์ฟ',
-    },
-    {
-      'id': 'ORD003',
-      'table': 'โต๊ะ 5',
-      'items': ['ข้าวมันไก่'],
-      'status': 'ยังไม่เริ่ม',
-    },
-  ];
+  List<Map<String, dynamic>> cancelLogs = [];
+  bool loading = true;
 
-  void cancelOrder(int index) {
+  final TextEditingController detailNoController = TextEditingController();
+  final TextEditingController orderNoController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController cancelByController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    loadCancelLogs();
+  }
+
+  Future<void> loadCancelLogs() async {
+    try {
+      final data = await CancelOrderService.fetchCancelLogs();
+      setState(() {
+        cancelLogs = List<Map<String, dynamic>>.from(data);
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("โหลดข้อมูลล้มเหลว: $e")));
+    }
+  }
+
+  Future<void> addCancelLog() async {
+    try {
+      await CancelOrderService.addCancelLog(
+        detailNo: int.parse(detailNoController.text),
+        orderNo: int.parse(orderNoController.text),
+        description: descriptionController.text,
+        cancelBy: cancelByController.text,
+      );
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("เพิ่มการยกเลิกสำเร็จ")));
+      loadCancelLogs(); // refresh
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("เพิ่มการยกเลิกไม่สำเร็จ: $e")));
+    }
+  }
+
+  void openAddDialog() {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('ยืนยันการยกเลิก'),
-            content: Text(
-              'คุณต้องการยกเลิกออเดอร์ ${orders[index]['id']} หรือไม่?',
+            title: const Text("ยกเลิกออเดอร์"),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: detailNoController,
+                    decoration: const InputDecoration(labelText: "Detail No"),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextField(
+                    controller: orderNoController,
+                    decoration: const InputDecoration(labelText: "Order No"),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(labelText: "รายละเอียด"),
+                  ),
+                  TextField(
+                    controller: cancelByController,
+                    decoration: const InputDecoration(labelText: "ผู้ยกเลิก"),
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('ไม่'),
+                child: const Text("ยกเลิก"),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    orders.removeAt(index);
-                  });
+                  addCancelLog();
                   Navigator.pop(context);
                 },
-                child: const Text(
-                  'ยกเลิกออเดอร์',
-                  style: TextStyle(color: Colors.red),
-                ),
+                child: const Text("บันทึก"),
               ),
             ],
           ),
@@ -62,41 +107,43 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cancel Order'),
-        backgroundColor: Colors.redAccent,
-      ),
+      appBar: AppBar(title: const Text("บันทึกการยกเลิกออเดอร์")),
       body:
-          orders.isEmpty
-              ? const Center(child: Text('ไม่มีออเดอร์ที่สามารถยกเลิกได้'))
+          cancelLogs.isEmpty
+              ? const Center(child: Text("ไม่มีข้อมูลการยกเลิก"))
               : ListView.builder(
-                itemCount: orders.length,
+                itemCount: cancelLogs.length,
                 itemBuilder: (context, index) {
-                  final order = orders[index];
+                  final log = cancelLogs[index];
                   return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    margin: const EdgeInsets.all(8),
                     child: ListTile(
-                      title: Text('รหัสออเดอร์: ${order['id']}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('โต๊ะ: ${order['table']}'),
-                          Text('เมนู: ${order['items'].join(', ')}'),
-                          Text('สถานะ: ${order['status']}'),
-                        ],
+                      title: Text(
+                        "OrderNo: ${log['orderNo']} | DetailNo: ${log['detailNo']}",
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.cancel, color: Colors.red),
-                        onPressed: () => cancelOrder(index),
+                      subtitle: Text(
+                        "เหตุผล: ${log['description']}\nผู้ยกเลิก: ${log['cancelBy']}",
+                      ),
+                      trailing: Text(
+                        log['createAt'] ?? "",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   );
                 },
               ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: openAddDialog,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

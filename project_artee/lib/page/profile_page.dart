@@ -13,36 +13,9 @@ class _ProfilePageState extends State<ProfilePage> {
     'id': 'EMP001',
     'firstName': 'Manatchai',
     'lastName': 'JACK',
-    'email': 'manatchai@example.com',
     'phone': '081-234-5678',
     'role': 'พนักงานร้านอาหาร',
   };
-
-  bool isEditing = false; // toggle แก้ไข/ดูอย่างเดียว
-
-  // Controller สำหรับ TextField
-  late TextEditingController firstNameController;
-  late TextEditingController lastNameController;
-  late TextEditingController emailController;
-  late TextEditingController phoneController;
-
-  @override
-  void initState() {
-    super.initState();
-    firstNameController = TextEditingController(text: userData['firstName']);
-    lastNameController = TextEditingController(text: userData['lastName']);
-    emailController = TextEditingController(text: userData['email']);
-    phoneController = TextEditingController(text: userData['phone']);
-  }
-
-  @override
-  void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,83 +46,12 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 20),
 
-            // รายละเอียดข้อมูล (ดู/แก้ไข)
-            isEditing
-                ? _buildEditableForm()
-                : Column(
-                  children: [
-                    _buildInfoCard(
-                      Icons.badge,
-                      "รหัสพนักงาน",
-                      userData['id'] ?? "",
-                    ),
-                    _buildInfoCard(
-                      Icons.email,
-                      "อีเมล",
-                      userData['email'] ?? "",
-                    ),
-                    _buildInfoCard(
-                      Icons.phone,
-                      "เบอร์โทร",
-                      userData['phone'] ?? "",
-                    ),
-                  ],
-                ),
-
-            const Spacer(),
-
-            // ปุ่ม แก้ไข/บันทึก
-            ElevatedButton.icon(
-              onPressed: () {
-                setState(() {
-                  if (isEditing) {
-                    // ✅ บันทึกข้อมูลเมื่อกด Save
-                    userData['firstName'] = firstNameController.text;
-                    userData['lastName'] = lastNameController.text;
-                    userData['email'] = emailController.text;
-                    userData['phone'] = phoneController.text;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("บันทึกข้อมูลเรียบร้อย ✅")),
-                    );
-                  }
-                  isEditing = !isEditing; // toggle state
-                });
-              },
-              icon: Icon(isEditing ? Icons.save : Icons.edit),
-              label: Text(isEditing ? "บันทึก" : "แก้ไขโปรไฟล์"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-            ),
+            // รายละเอียดข้อมูล
+            _buildInfoCard(Icons.badge, "รหัสพนักงาน", userData['id'] ?? ""),
+            _buildInfoCard(Icons.phone, "เบอร์โทร", userData['phone'] ?? ""),
           ],
         ),
       ),
-    );
-  }
-
-  // ✅ Form สำหรับแก้ไข
-  Widget _buildEditableForm() {
-    return Column(
-      children: [
-        TextField(
-          controller: firstNameController,
-          decoration: const InputDecoration(labelText: "ชื่อจริง"),
-        ),
-        TextField(
-          controller: lastNameController,
-          decoration: const InputDecoration(labelText: "นามสกุล"),
-        ),
-        TextField(
-          controller: emailController,
-          decoration: const InputDecoration(labelText: "อีเมล"),
-        ),
-        TextField(
-          controller: phoneController,
-          decoration: const InputDecoration(labelText: "เบอร์โทร"),
-        ),
-      ],
     );
   }
 

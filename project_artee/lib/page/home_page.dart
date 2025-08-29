@@ -4,10 +4,8 @@ import 'package:project_artee/page/confirm_payment_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
 import 'package:project_artee/page/profile_page.dart';
-import 'package:project_artee/page/publish.dart';
-import 'package:project_artee/services/genarate_qr_api.dart';
 import 'package:project_artee/views/login_view.dart';
-import 'menu_page.dart'; // import หน้าเมนูที่คุณเขียนไว้
+import 'menu_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,14 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // กำหนดหน้าที่จะใช้ใน HomePage (5 หน้า)
   final List<Widget> _pages = [
-    const MenuTablePage(), // หน้าตารางเมนู api
-    const MenuPage(), // หน้าเมนู api
-    const GenerateQrPage(), // หน้าสร้างและแชร์ QR Code
-    const ProfilePage(), // หน้าโปรไฟล์
-    const CancelOrderPage(), // หน้ายกเลิกออเดอร์
-    const ConfirmPaymentPage(), // หน้ายืนยันการชำระเงิน
+    const MenuTablePage(),
+    const MenuPage(),
+    const GenerateQrPage(),
+    const ProfilePage(),
+    const CancelOrderPage(),
+    const ConfirmPaymentPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -44,12 +41,12 @@ class _HomePageState extends State<HomePage> {
             content: const Text('คุณต้องการออกจากระบบหรือไม่?'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(), // ยกเลิก
+                onPressed: () => Navigator.of(context).pop(),
                 child: const Text('ยกเลิก'),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // ปิด dialog ก่อน
+                  Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginView()),
@@ -75,18 +72,43 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // ✅ ต้องใส่ถ้าเกิน 3 item
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "หน้าหลัก"),
-          BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "เมนู"),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: "QR Code"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "โปรไฟล์"),
-          BottomNavigationBarItem(icon: Icon(Icons.cancel), label: "ยกเลิก"),
-          BottomNavigationBarItem(icon: Icon(Icons.payment), label: "ชำระเงิน"),
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            labelType: NavigationRailLabelType.all, // โชว์ label ตลอด
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home),
+                label: Text("หน้าหลัก"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.fastfood),
+                label: Text("เมนู"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.qr_code),
+                label: Text("QR Code"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.person),
+                label: Text("โปรไฟล์"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.cancel),
+                label: Text("ยกเลิก"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.payment),
+                label: Text("ชำระเงิน"),
+              ),
+            ],
+          ),
+          const VerticalDivider(thickness: 1, width: 1), // เส้นแบ่ง
+          Expanded(
+            child: _pages[_selectedIndex], // เนื้อหาหน้า
+          ),
         ],
       ),
     );

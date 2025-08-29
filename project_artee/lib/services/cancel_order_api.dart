@@ -2,18 +2,39 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class CancelOrderService {
-  static const String baseUrl = "http://10.0.2.2:3000/api/admin/menu";
+  static const String baseUrl =
+      "http://10.0.2.2:3000/api/admin/cancel-order"; // 🔹 เปลี่ยนเป็น API จริง
 
-  /// ดึงข้อมูลเมนูทั้งหมด
-  static Future<List<dynamic>> fetchMenus() async {
-    final response = await http.get(Uri.parse(baseUrl));
-
+  /// ดึงข้อมูลการยกเลิกทั้งหมด
+  static Future<List<Map<String, dynamic>>> fetchCancelLogs() async {
+    final response = await http.get(Uri.parse("$baseUrl/cancel-order-logs"));
     if (response.statusCode == 200) {
-      return json.decode(response.body) as List<dynamic>;
+      final List<dynamic> data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data);
     } else {
-      throw Exception("Failed to load menus");
+      throw Exception("Failed to load cancel logs");
     }
   }
 
-  /// อัพเดตค่า Home ของเมนู
+  /// เพิ่มการยกเลิกใหม่
+  static Future<void> addCancelLog({
+    required int detailNo,
+    required int orderNo,
+    required String description,
+    required String cancelBy,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/cancel-order-logs"),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        "detailNo": detailNo,
+        "orderNo": orderNo,
+        "description": description,
+        "cancelBy": cancelBy,
+      }),
+    );
+    if (response.statusCode != 201) {
+      throw Exception("Failed to add cancel log");
+    }
+  }
 }
