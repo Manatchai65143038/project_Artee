@@ -5,7 +5,6 @@ import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/login_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
 import 'package:project_artee/page/staff_page.dart';
-import 'package:project_artee/views/login_view.dart';
 import 'menu_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -69,7 +68,7 @@ class _HomePageState extends State<HomePage>
                   Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
                 },
                 child: const Text('ตกลง'),
@@ -88,12 +87,19 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isDesktop = screenWidth > 600; // กำหนด breakpoint
+    final isDesktop = screenWidth > 600;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Restaurant Artee"),
+        backgroundColor: Colors.white.withOpacity(0.9),
+        elevation: 3,
+        title: const Text(
+          "Restaurant Artee",
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -106,6 +112,9 @@ class _HomePageState extends State<HomePage>
                 : TabBar(
                   controller: _tabController,
                   isScrollable: true,
+                  indicatorColor: const Color(0xFF4A90E2),
+                  labelColor: const Color(0xFF4A90E2),
+                  unselectedLabelColor: Colors.black54,
                   tabs: List.generate(
                     _tabTitles.length,
                     (index) => Tab(
@@ -115,35 +124,55 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
       ),
-      body:
-          isDesktop
-              ? Row(
-                children: [
-                  NavigationRail(
-                    selectedIndex: _tabController.index,
-                    onDestinationSelected:
-                        (index) => setState(() {
-                          _tabController.index = index;
-                        }),
-                    labelType: NavigationRailLabelType.all,
-                    destinations: List.generate(
-                      _tabTitles.length,
-                      (index) => NavigationRailDestination(
-                        icon: Icon(_tabIcons[index]),
-                        label: Text(_tabTitles[index]),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFFAFAFA), Color(0xFFEFF7FF)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child:
+            isDesktop
+                ? Row(
+                  children: [
+                    NavigationRail(
+                      backgroundColor: Colors.white.withOpacity(0.95),
+                      selectedIndex: _tabController.index,
+                      onDestinationSelected:
+                          (index) => setState(() {
+                            _tabController.index = index;
+                          }),
+                      labelType: NavigationRailLabelType.all,
+                      selectedIconTheme: const IconThemeData(
+                        color: Color(0xFF4A90E2),
+                      ),
+                      selectedLabelTextStyle: const TextStyle(
+                        color: Color(0xFF4A90E2),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      unselectedIconTheme: const IconThemeData(
+                        color: Colors.black54,
+                      ),
+                      destinations: List.generate(
+                        _tabTitles.length,
+                        (index) => NavigationRailDestination(
+                          icon: Icon(_tabIcons[index]),
+                          label: Text(_tabTitles[index]),
+                        ),
                       ),
                     ),
-                  ),
-                  const VerticalDivider(thickness: 1, width: 1),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: _pages,
+                    const VerticalDivider(thickness: 1, width: 1),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: _pages,
+                      ),
                     ),
-                  ),
-                ],
-              )
-              : TabBarView(controller: _tabController, children: _pages),
+                  ],
+                )
+                : TabBarView(controller: _tabController, children: _pages),
+      ),
     );
   }
 }
