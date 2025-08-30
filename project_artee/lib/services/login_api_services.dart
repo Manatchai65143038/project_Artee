@@ -1,19 +1,30 @@
+// services/auth_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class LoginService {
-  static const String baseUrl = "http://10.0.2.2:3000/api/admin/menu";
+class AuthService {
+  static const String baseUrl = "http://10.0.2.2:3000/api/auth";
 
-  /// ดึงข้อมูลเมนูทั้งหมด
-  static Future<List<dynamic>> fetchMenus() async {
-    final response = await http.get(Uri.parse(baseUrl));
+  /// Login
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({"email": email, "password": password}),
+    );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as List<dynamic>;
+      final jsonData = json.decode(response.body);
+      if (jsonData['success'] == true) {
+        return jsonData; // ส่ง token + staff info
+      } else {
+        throw Exception(jsonData['error'] ?? "Login ไม่สำเร็จ");
+      }
     } else {
-      throw Exception("Failed to load menus");
+      throw Exception("Login ล้มเหลว: ${response.statusCode}");
     }
   }
-
-  /// อัพเดตค่า Home ของเมนู
 }

@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage>
     MenuTablePage(),
     MenuPage(),
     GenerateQrPage(),
-    StaffTablePage(),
+    StaffPage(),
     CancelOrderPage(),
     ConfirmPaymentPage(),
   ];

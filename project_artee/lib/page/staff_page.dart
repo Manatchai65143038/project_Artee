@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/staff_api.dart';
 
-class StaffTablePage extends StatefulWidget {
-  const StaffTablePage({super.key});
+class StaffPage extends StatefulWidget {
+  const StaffPage({super.key});
 
   @override
-  State<StaffTablePage> createState() => _StaffTablePageState();
+  State<StaffPage> createState() => _StaffPageState();
 }
 
-class _StaffTablePageState extends State<StaffTablePage> {
+class _StaffPageState extends State<StaffPage> {
   List<dynamic> staffs = [];
   bool loading = true;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -18,7 +19,13 @@ class _StaffTablePageState extends State<StaffTablePage> {
     loadStaffs();
   }
 
+  /// โหลดข้อมูล Staff
   Future<void> loadStaffs() async {
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
+
     try {
       final data = await StaffService.fetchStaffs();
       setState(() {
@@ -26,75 +33,56 @@ class _StaffTablePageState extends State<StaffTablePage> {
         loading = false;
       });
     } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      setState(() {
+        loading = false;
+        errorMessage = e.toString();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Row(
-          children: [
-            Icon(Icons.receipt_long),
-            SizedBox(width: 8),
-            Text(" รายการพนักงาน"),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: const Text("Staff Management")),
       body:
           loading
               ? const Center(child: CircularProgressIndicator())
+              : errorMessage != null
+              ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(errorMessage!, textAlign: TextAlign.center),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: loadStaffs,
+                      child: const Text("ลองใหม่"),
+                    ),
+                  ],
+                ),
+              )
               : staffs.isEmpty
               ? const Center(child: Text("ไม่มีข้อมูลพนักงาน"))
-              : SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columnSpacing: 20,
-                  headingRowColor: MaterialStateProperty.all(
-                    Colors.grey.shade200,
-                  ),
-                  border: TableBorder(
-                    horizontalInside: BorderSide(
-                      width: 0.5,
-                      color: Colors.grey.shade300,
+              : ListView.builder(
+                itemCount: staffs.length,
+                itemBuilder: (context, index) {
+                  final staff = staffs[index];
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          staff['image'] != null && staff['image'] != ""
+                              ? staff['image']
+                              : "https://via.placeholder.com/150",
+                        ),
+                      ),
+                      title: Text("${staff['name']} ${staff['surname']}"),
+                      subtitle: Text(staff['email']),
                     ),
-                  ),
-                  columns: const [
-                    DataColumn(label: Text("รูป")),
-                    DataColumn(label: Text("รหัสพนักงาน")),
-                    DataColumn(label: Text("ชื่อ")),
-                    DataColumn(label: Text("นามสกุล")),
-                    DataColumn(label: Text("เบอร์โทร")),
-                    DataColumn(label: Text("อีเมล")),
-                  ],
-                  rows:
-                      staffs.map((staff) {
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  staff['image'] ?? "",
-                                ),
-                                radius: 25,
-                                onBackgroundImageError:
-                                    (_, __) => const Icon(Icons.person),
-                              ),
-                            ),
-                            DataCell(Text(staff['staffID'] ?? "")),
-                            DataCell(Text(staff['name'] ?? "")),
-                            DataCell(Text(staff['surname'] ?? "")),
-                            DataCell(Text(staff['telNo'] ?? "")),
-                            DataCell(Text(staff['email'] ?? "")),
-                          ],
-                        );
-                      }).toList(),
-                ),
+                  );
+                },
               ),
+      // ลบ FloatingActionButton ออก
     );
   }
 }

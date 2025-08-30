@@ -1,45 +1,37 @@
-// services/staff_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class StaffService {
+  // ปรับ URL ให้ตรงกับ Next.js API ของคุณ
   static const String baseUrl = "http://10.0.2.2:3000/api/admin/staff";
 
+  /// GET: ดึงข้อมูล Staff
   static Future<List<dynamic>> fetchStaffs() async {
     final response = await http.get(Uri.parse(baseUrl));
+
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final jsonData = json.decode(response.body);
+      if (jsonData['success'] == true) {
+        return jsonData['data'];
+      } else {
+        throw Exception(jsonData['error'] ?? "ไม่สามารถโหลด Staff ได้");
+      }
     } else {
-      throw Exception("Failed to load staff");
+      throw Exception("โหลด Staff ไม่สำเร็จ: ${response.statusCode}");
     }
   }
 
-  static Future<void> addStaff(Map<String, dynamic> data) async {
+  /// POST: เพิ่ม Staff
+  static Future<void> createStaff(Map<String, dynamic> staffData) async {
     final response = await http.post(
       Uri.parse(baseUrl),
       headers: {"Content-Type": "application/json"},
-      body: json.encode(data),
+      body: json.encode(staffData),
     );
-    if (response.statusCode != 200) {
-      throw Exception("Failed to add staff");
-    }
-  }
 
-  static Future<void> updateStaff(String id, Map<String, dynamic> data) async {
-    final response = await http.put(
-      Uri.parse("$baseUrl/$id"),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(data),
-    );
-    if (response.statusCode != 200) {
-      throw Exception("Failed to update staff");
-    }
-  }
-
-  static Future<void> deleteStaff(String id) async {
-    final response = await http.delete(Uri.parse("$baseUrl/$id"));
-    if (response.statusCode != 200) {
-      throw Exception("Failed to delete staff");
+    if (response.statusCode != 201) {
+      final jsonData = json.decode(response.body);
+      throw Exception(jsonData['error'] ?? "เกิดข้อผิดพลาดในการสร้าง Staff");
     }
   }
 }
