@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/staff_api.dart';
 
-// สมบูรณ์
-
 class StaffPage extends StatefulWidget {
   const StaffPage({super.key});
 
@@ -45,7 +43,12 @@ class _StaffPageState extends State<StaffPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Staff Management")),
+      backgroundColor: Colors.orange.shade50, // ✅ พื้นหลังส้มอ่อน
+      appBar: AppBar(
+        title: const Text("👨‍💼 Staff Management"),
+        centerTitle: true,
+        backgroundColor: Colors.deepOrange, // ✅ หัวส้มเข้ม
+      ),
       body:
           loading
               ? const Center(child: CircularProgressIndicator())
@@ -54,11 +57,25 @@ class _StaffPageState extends State<StaffPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(errorMessage!, textAlign: TextAlign.center),
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.deepOrange,
+                      size: 50,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
                     const SizedBox(height: 20),
-                    ElevatedButton(
+                    ElevatedButton.icon(
                       onPressed: loadStaffs,
-                      child: const Text("ลองใหม่"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // ✅ ปุ่มเขียว
+                      ),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("ลองใหม่"),
                     ),
                   ],
                 ),
@@ -66,20 +83,42 @@ class _StaffPageState extends State<StaffPage> {
               : staffs.isEmpty
               ? const Center(child: Text("ไม่มีข้อมูลพนักงาน"))
               : ListView.builder(
+                padding: const EdgeInsets.all(12),
                 itemCount: staffs.length,
                 itemBuilder: (context, index) {
                   final staff = staffs[index];
                   return Card(
+                    color: Colors.white,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          staff['image'] != null && staff['image'] != ""
-                              ? staff['image']
-                              : "https://via.placeholder.com/150",
+                        radius: 28,
+                        backgroundColor:
+                            Colors.green.shade200, // ✅ กรอบเขียวอ่อน
+                        child: CircleAvatar(
+                          radius: 25,
+                          backgroundImage: NetworkImage(
+                            staff['image'] != null && staff['image'] != ""
+                                ? staff['image']
+                                : "https://via.placeholder.com/150",
+                          ),
                         ),
                       ),
-                      title: Text("${staff['name']} ${staff['surname']}"),
-                      subtitle: Text(staff['email']),
+                      title: Text(
+                        "${staff['name']} ${staff['surname']}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange,
+                        ),
+                      ),
+                      subtitle: Text(
+                        staff['email'],
+                        style: const TextStyle(color: Colors.black54),
+                      ),
                     ),
                   );
                 },

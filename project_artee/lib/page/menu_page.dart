@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/menu_api.dart';
 
-// สมบูรณ์
-
+// ✅ โทนส้ม + เขียว สดชื่น
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -62,33 +61,80 @@ class _MenuPageState extends State<MenuPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Center(child: const Text("เมนูอาหาร"))),
+      backgroundColor: Colors.orange[50], // ✅ พื้นหลังส้มอ่อน
+      appBar: AppBar(
+        title: const Text("เมนูอาหาร"),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.deepOrange, // ✅ ส้มเข้ม
+      ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600), // ไม่ยืดเกิน 600
+          constraints: const BoxConstraints(maxWidth: 600),
           child:
               menus.isEmpty
-                  ? const Center(child: Text("ไม่มีเมนู"))
+                  ? const Center(
+                    child: Text(
+                      "ไม่มีเมนู",
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  )
                   : ListView.builder(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(12),
                     itemCount: menus.length,
                     itemBuilder: (context, index) {
                       final menu = menus[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 5,
+                        shadowColor: Colors.green.withOpacity(
+                          0.3,
+                        ), // ✅ เงาเขียว
+                        margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
-                          leading: Image.network(
-                            menu['image'] ?? "",
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    const Icon(Icons.fastfood),
+                          contentPadding: const EdgeInsets.all(12),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              menu['image'] ?? "",
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) => Container(
+                                    width: 70,
+                                    height: 70,
+                                    color: Colors.orange[100],
+                                    child: const Icon(
+                                      Icons.fastfood,
+                                      color: Colors.green,
+                                      size: 30,
+                                    ),
+                                  ),
+                            ),
                           ),
-                          title: Text(menu['name'] ?? ""),
-                          subtitle: Text("ราคา: ${menu['price']} บาท"),
+                          title: Text(
+                            menu['name'] ?? "",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepOrange, // ✅ หัวข้อส้ม
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              "ราคา: ${menu['price']} บาท",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.green[700], // ✅ เขียวเข้ม
+                              ),
+                            ),
+                          ),
                           trailing: Switch(
+                            activeColor: Colors.green, // ✅ Switch สีเขียว
                             value: menu['isAvailable'] == true,
                             onChanged:
                                 (value) =>

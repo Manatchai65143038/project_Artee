@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/menu_api.dart';
 
-// 📋 แสดงตารางเมนู
+// 📋 แสดงตารางเมนู (โทนเขียว+ส้ม)
 class MenuTablePage extends StatefulWidget {
   const MenuTablePage({super.key});
 
@@ -41,28 +41,32 @@ class _MenuTablePageState extends State<MenuTablePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("📋 รายการเมนู"), centerTitle: true),
+      backgroundColor: Colors.orange.shade50, // ✅ พื้นหลังส้มอ่อนทั้งหน้า
+      appBar: AppBar(
+        title: const Text("📋 รายการเมนู"),
+        centerTitle: true,
+        backgroundColor: Colors.deepOrange, // ✅ หัว AppBar สีส้มเข้ม
+      ),
       body:
           menus.isEmpty
               ? const Center(child: Text("ไม่มีเมนู"))
               : SingleChildScrollView(
-                scrollDirection: Axis.horizontal, // เลื่อนในแนวนอน
+                scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minWidth:
-                        MediaQuery.of(context).size.width, // ให้กว้างเท่าหน้าจอ
+                    minWidth: MediaQuery.of(context).size.width,
                   ),
                   child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical, // เลื่อนในแนวตั้ง
+                    scrollDirection: Axis.vertical,
                     child: DataTable(
                       columnSpacing: 20,
                       headingRowColor: MaterialStateProperty.all(
-                        Colors.grey.shade200,
+                        Colors.orange.shade200, // ✅ หัวตารางส้มอ่อนเข้มกว่า bg
                       ),
                       border: TableBorder(
                         horizontalInside: BorderSide(
                           width: 0.5,
-                          color: Colors.grey.shade300,
+                          color: Colors.green.shade300, // ✅ เส้นเขียวอ่อน
                         ),
                       ),
                       columns: const [
@@ -101,8 +105,10 @@ class _MenuTablePageState extends State<MenuTablePage> {
                                     decoration: BoxDecoration(
                                       color:
                                           (menu['isAvailable'] == true)
-                                              ? Colors.green
-                                              : Colors.red,
+                                              ? Colors
+                                                  .green // ✅ เขียวถ้าพร้อมขาย
+                                              : Colors
+                                                  .deepOrange, // ✅ ส้มถ้าไม่พร้อมขาย
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
