@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_artee/page/cancel_order_page.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
+import 'package:project_artee/page/login_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
 import 'package:project_artee/page/staff_page.dart';
 import 'package:project_artee/views/login_view.dart';
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage>
                   Navigator.of(context).pop();
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginView()),
+                    MaterialPageRoute(builder: (context) => LoginPage()),
                   );
                 },
                 child: const Text('ตกลง'),
