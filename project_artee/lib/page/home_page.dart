@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Colors.white.withOpacity(0.9),
         elevation: 3,
         title: const Text(
-          "Restaurant Artee",
+          "Restaurant Atree",
           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
