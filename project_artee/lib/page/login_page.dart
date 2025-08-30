@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     if (result["success"]) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("เข้าสู่ระบบสำเร็จ 🎉"),
+          content: Text("เข้าสู่ระบบสำเร็จ"),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 2),
         ),
@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("รหัสไม่ถูกต้อง กรุณากรอกรหัสใหม่ ❌"),
+          content: Text("รหัสไม่ถูกต้อง กรุณากรอกรหัสใหม่"),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),
