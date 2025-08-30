@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/login_api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// ยังไม่เสร็จ
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,37 +12,36 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool loading = false;
-  String? errorMessage;
+  String? error;
 
   void handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       loading = true;
-      errorMessage = null;
+      error = null;
     });
 
     try {
-      final result = await AuthService.login(
-        emailController.text.trim(),
-        passwordController.text.trim(),
+      final data = await AuthService.login(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
       );
-      setState(() => loading = false);
 
-      // TODO: Save token และนำไปหน้าอื่น
-      print("Login สำเร็จ: ${result['staff']}");
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString("token", data['token']);
+      await prefs.setString("role", data['role']);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login สำเร็จ")));
+      // redirect ไปหน้าแรก
+      Navigator.pushReplacementNamed(context, "/");
     } catch (e) {
       setState(() {
+        error = e.toString().replaceFirst("Exception: ", "");
+      });
+    } finally {
+      setState(() {
         loading = false;
-        errorMessage = e.toString();
       });
     }
   }
@@ -47,52 +49,47 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
+                  Text(
+                    "Login",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  if (error != null)
+                    Text(error!, style: TextStyle(color: Colors.red)),
+                  TextField(
                     controller: emailController,
-                    decoration: const InputDecoration(labelText: "Email"),
-                    keyboardType: TextInputType.emailAddress,
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? "กรุณากรอก Email"
-                                : null,
+                    decoration: InputDecoration(labelText: "Email"),
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
+                  const SizedBox(height: 10),
+                  TextField(
                     controller: passwordController,
-                    decoration: const InputDecoration(labelText: "Password"),
                     obscureText: true,
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? "กรุณากรอก Password"
-                                : null,
+                    decoration: InputDecoration(labelText: "Password"),
                   ),
-                  const SizedBox(height: 24),
-                  loading
-                      ? const CircularProgressIndicator()
-                      : ElevatedButton(
-                        onPressed: handleLogin,
-                        child: const Text("Login"),
-                      ),
-                  if (errorMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text(
-                        errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: loading ? null : handleLogin,
+                      child:
+                          loading
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : Text("Login"),
                     ),
+                  ),
                 ],
               ),
             ),
