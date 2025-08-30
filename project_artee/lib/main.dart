@@ -5,7 +5,6 @@ import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/home_page.dart';
 import 'package:project_artee/page/login_page.dart';
 import 'package:project_artee/page/menu_page.dart';
-import 'package:project_artee/page/food_statuspage.dart';
 import 'package:project_artee/views/login_view.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginPage(),
+      home: LoginView(),
     );
   }
 }

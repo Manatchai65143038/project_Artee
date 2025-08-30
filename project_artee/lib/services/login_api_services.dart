@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+//ยังไม่สมบูรณ์
+
 class AuthService {
-  static const String baseUrl =
-      "http://10.0.2.2:3000/api/admin/staff/test"; //ยังไม่สมบูรณ์
+  static const String baseUrl = "http://10.0.2.2:3000/api/admin/staff/test";
 
   static Future<Map<String, dynamic>> login({
     required String email,

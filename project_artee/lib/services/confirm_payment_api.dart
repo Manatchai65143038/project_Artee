@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// ยังไม่สมบูรณ์
+
 class PaymentService {
   static const String baseUrl = "http://localhost:3000/api/payments";
 
