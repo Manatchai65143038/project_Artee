@@ -132,46 +132,57 @@ class _HomePageState extends State<HomePage>
             end: Alignment.bottomRight,
           ),
         ),
-        child:
-            isDesktop
-                ? Row(
-                  children: [
-                    NavigationRail(
-                      backgroundColor: Colors.white.withOpacity(0.95),
-                      selectedIndex: _tabController.index,
-                      onDestinationSelected:
-                          (index) => setState(() {
-                            _tabController.index = index;
-                          }),
-                      labelType: NavigationRailLabelType.all,
-                      selectedIconTheme: const IconThemeData(
-                        color: Color(0xFF4A90E2),
-                      ),
-                      selectedLabelTextStyle: const TextStyle(
-                        color: Color(0xFF4A90E2),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      unselectedIconTheme: const IconThemeData(
-                        color: Colors.black54,
-                      ),
-                      destinations: List.generate(
-                        _tabTitles.length,
-                        (index) => NavigationRailDestination(
-                          icon: Icon(_tabIcons[index]),
-                          label: Text(_tabTitles[index]),
+        child: SafeArea(
+          child:
+              isDesktop
+                  ? Row(
+                    children: [
+                      NavigationRail(
+                        backgroundColor: Colors.white.withOpacity(0.95),
+                        selectedIndex: _tabController.index,
+                        onDestinationSelected:
+                            (index) => setState(() {
+                              _tabController.index = index;
+                            }),
+                        labelType: NavigationRailLabelType.all,
+                        selectedIconTheme: const IconThemeData(
+                          color: Color(0xFF4A90E2),
+                        ),
+                        selectedLabelTextStyle: const TextStyle(
+                          color: Color(0xFF4A90E2),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        unselectedIconTheme: const IconThemeData(
+                          color: Colors.black54,
+                        ),
+                        destinations: List.generate(
+                          _tabTitles.length,
+                          (index) => NavigationRailDestination(
+                            icon: Icon(_tabIcons[index]),
+                            label: Text(_tabTitles[index]),
+                          ),
                         ),
                       ),
-                    ),
-                    const VerticalDivider(thickness: 1, width: 1),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: _pages,
+                      const VerticalDivider(thickness: 1, width: 1),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: _pages,
+                          ),
+                        ),
                       ),
+                    ],
+                  )
+                  : Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: _pages,
                     ),
-                  ],
-                )
-                : TabBarView(controller: _tabController, children: _pages),
+                  ),
+        ),
       ),
     );
   }

@@ -62,7 +62,7 @@ class _MenuPageState extends State<MenuPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("เมนูอาหาร")),
+      appBar: AppBar(title: Center(child: const Text("เมนูอาหาร"))),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600), // ไม่ยืดเกิน 600
