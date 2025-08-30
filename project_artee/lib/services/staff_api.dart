@@ -1,50 +1,45 @@
+// services/staff_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class StaffService {
-  static const String baseUrl = "http://localhost:3000/api";
+  static const String baseUrl = "http://10.0.2.2:3000/api/admin/staff";
 
-  static Future<List<Map<String, dynamic>>> fetchStaffs() async {
-    final response = await http.get(Uri.parse("$baseUrl/staffs"));
+  static Future<List<dynamic>> fetchStaffs() async {
+    final response = await http.get(Uri.parse(baseUrl));
     if (response.statusCode == 200) {
-      return List<Map<String, dynamic>>.from(json.decode(response.body));
+      return json.decode(response.body);
     } else {
-      throw Exception("Failed to fetch staffs");
+      throw Exception("Failed to load staff");
     }
   }
 
-  static Future<void> addStaff({
-    required String name,
-    required String surname,
-    required String telNo,
-    String? image,
-    String? fileID,
-  }) async {
+  static Future<void> addStaff(Map<String, dynamic> data) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/staffs"),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode({
-        "name": name,
-        "surname": surname,
-        "telNo": telNo,
-        "image": image ?? "",
-        "fileID": fileID ?? "",
-      }),
-    );
-    if (response.statusCode != 201) throw Exception("Failed to add staff");
-  }
-
-  static Future<void> updateStaff(int id, Map<String, dynamic> data) async {
-    final response = await http.put(
-      Uri.parse("$baseUrl/staffs/$id"),
+      Uri.parse(baseUrl),
       headers: {"Content-Type": "application/json"},
       body: json.encode(data),
     );
-    if (response.statusCode != 200) throw Exception("Failed to update staff");
+    if (response.statusCode != 200) {
+      throw Exception("Failed to add staff");
+    }
   }
 
-  static Future<void> deleteStaff(int id) async {
-    final response = await http.delete(Uri.parse("$baseUrl/staffs/$id"));
-    if (response.statusCode != 200) throw Exception("Failed to delete staff");
+  static Future<void> updateStaff(String id, Map<String, dynamic> data) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/$id"),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(data),
+    );
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update staff");
+    }
+  }
+
+  static Future<void> deleteStaff(String id) async {
+    final response = await http.delete(Uri.parse("$baseUrl/$id"));
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete staff");
+    }
   }
 }
