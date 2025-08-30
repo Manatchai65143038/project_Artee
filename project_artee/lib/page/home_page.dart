@@ -89,6 +89,9 @@ class _HomePageState extends State<HomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 600;
 
+    const Color primaryGreen = Color(0xFF4CAF50); // สีเขียวหลัก
+    const Color secondaryOrange = Color(0xFFFF9800); // สีส้มรอง
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -96,14 +99,18 @@ class _HomePageState extends State<HomePage>
         elevation: 3,
         title: const Text(
           "Restaurant Atree",
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: primaryGreen,
+            fontWeight: FontWeight.bold,
+          ), // เขียว
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: primaryGreen),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
+            color: primaryGreen,
           ),
         ],
         bottom:
@@ -112,9 +119,9 @@ class _HomePageState extends State<HomePage>
                 : TabBar(
                   controller: _tabController,
                   isScrollable: true,
-                  indicatorColor: const Color(0xFF4A90E2),
-                  labelColor: const Color(0xFF4A90E2),
-                  unselectedLabelColor: Colors.black54,
+                  indicatorColor: secondaryOrange,
+                  labelColor: secondaryOrange,
+                  unselectedLabelColor: primaryGreen.withOpacity(0.7),
                   tabs: List.generate(
                     _tabTitles.length,
                     (index) => Tab(
@@ -127,7 +134,10 @@ class _HomePageState extends State<HomePage>
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFAFAFA), Color(0xFFEFF7FF)],
+            colors: [
+              Color(0xFFE8F5E9),
+              Color(0xFFFFF3E0),
+            ], // เขียวอ่อน -> ส้มอ่อน
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -146,14 +156,14 @@ class _HomePageState extends State<HomePage>
                             }),
                         labelType: NavigationRailLabelType.all,
                         selectedIconTheme: const IconThemeData(
-                          color: Color(0xFF4A90E2),
+                          color: secondaryOrange,
                         ),
                         selectedLabelTextStyle: const TextStyle(
-                          color: Color(0xFF4A90E2),
+                          color: secondaryOrange,
                           fontWeight: FontWeight.bold,
                         ),
                         unselectedIconTheme: const IconThemeData(
-                          color: Colors.black54,
+                          color: primaryGreen,
                         ),
                         destinations: List.generate(
                           _tabTitles.length,

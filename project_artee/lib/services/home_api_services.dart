@@ -16,6 +16,4 @@ class HomeService {
       throw Exception("Failed to load menus");
     }
   }
-
-  /// อัพเดตค่า Home ของเมนู
 }
