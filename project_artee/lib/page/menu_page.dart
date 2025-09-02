@@ -63,7 +63,10 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       backgroundColor: Colors.orange[50], // ✅ พื้นหลังส้มอ่อน
       appBar: AppBar(
-        title: const Text("เมนูอาหาร"),
+        title: const Text(
+          "เมนูอาหาร",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.deepOrange, // ✅ ส้มเข้ม
@@ -129,12 +132,12 @@ class _MenuPageState extends State<MenuPage> {
                               "ราคา: ${menu['price']} บาท",
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Colors.green[700], // ✅ เขียวเข้ม
+                                color: Colors.black54, // ✅ หัวข้อดํา
                               ),
                             ),
                           ),
                           trailing: Switch(
-                            activeColor: Colors.green, // ✅ Switch สีเขียว
+                            activeColor: Colors.blue, // ✅ Switch ฟ้า
                             value: menu['isAvailable'] == true,
                             onChanged:
                                 (value) =>
