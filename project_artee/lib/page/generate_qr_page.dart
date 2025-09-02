@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:project_artee/services/genarate_qr_api.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,21 +14,36 @@ class GenerateQrPage extends StatefulWidget {
 }
 
 class _GenerateQrPageState extends State<GenerateQrPage> {
-  final TextEditingController _textCtrl = TextEditingController();
+  final TextEditingController _tableCtrl = TextEditingController();
   final ScreenshotController _screenshotController = ScreenshotController();
 
   String _qrData = "";
+  bool _loading = false;
 
-  void _generateQR() {
-    if (_textCtrl.text.trim().isEmpty) {
+  Future<void> _createOrder() async {
+    if (_tableCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("กรุณากรอกข้อความก่อน")));
+      ).showSnackBar(const SnackBar(content: Text("กรุณากรอกหมายเลขโต๊ะ")));
       return;
     }
-    setState(() {
-      _qrData = _textCtrl.text.trim();
-    });
+
+    setState(() => _loading = true);
+
+    final tableNo = int.tryParse(_tableCtrl.text.trim()) ?? 0;
+    final result = await OrderService.generateOrder(tableNo);
+
+    setState(() => _loading = false);
+
+    if (result["success"]) {
+      setState(() {
+        _qrData = result["data"]["authUrl"];
+      });
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result["message"])));
+    }
   }
 
   Future<void> _saveQR() async {
@@ -58,41 +74,43 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
     final file = File(filePath);
     await file.writeAsBytes(image);
 
-    await Share.shareXFiles([
-      XFile(filePath),
-    ], text: "นี่คือ QR Code ของฉัน 🎉");
+    await Share.shareXFiles([XFile(filePath)], text: "นี่คือ QR Code 🎉");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // ✅ ป้องกัน overflow
-      appBar: AppBar(title: const Text("Generate & Share QR Code")),
+      appBar: AppBar(title: const Text("Generate Order QR")),
       body: SingleChildScrollView(
-        // ✅ หุ้มด้วย scroll
+        // ✅ เพิ่ม SingleChildScrollView
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // ช่องกรอกข้อความ
             TextField(
-              controller: _textCtrl,
+              controller: _tableCtrl,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: "ข้อความหรือ URL",
+                labelText: "กรอกหมายเลขโต๊ะ",
                 border: OutlineInputBorder(),
               ),
-              onSubmitted: (_) => _generateQR(),
             ),
             const SizedBox(height: 12),
 
             ElevatedButton.icon(
-              onPressed: _generateQR,
-              icon: const Icon(Icons.qr_code),
+              onPressed: _loading ? null : _createOrder,
+              icon:
+                  _loading
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.qr_code),
               label: const Text("สร้าง QR"),
             ),
 
             const SizedBox(height: 20),
 
-            // แสดง QR (ถ้ามีข้อมูล)
             if (_qrData.isNotEmpty)
               Screenshot(
                 controller: _screenshotController,
@@ -109,7 +127,6 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
 
             const SizedBox(height: 20),
 
-            // ปุ่ม Save / Share
             if (_qrData.isNotEmpty)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
