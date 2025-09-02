@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ✅ พื้นหลังขาวสะอาด
+      backgroundColor: Colors.orange[50], // ✅ พื้นหลังส้มอ่อน
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Card(
               color: Colors.white,
               elevation: 12,
-              shadowColor: Colors.black12,
+              shadowColor: Colors.green.withOpacity(0.2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -83,18 +83,18 @@ class _LoginPageState extends State<LoginPage> {
                     const Icon(
                       Icons.lock_outline,
                       size: 70,
-                      color: Colors.blue,
+                      color: Colors.deepOrange, // ✅ ส้มสด
                     ),
                     const SizedBox(height: 20),
 
                     // 📝 Title
                     Text(
-                      "Staff Login",
+                      "Login",
                       style: Theme.of(
                         context,
                       ).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Colors.green[800], // ✅ เขียวเข้ม
                       ),
                     ),
 
@@ -106,12 +106,12 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
                           Icons.email_outlined,
-                          color: Colors.grey,
+                          color: Colors.deepOrange,
                         ),
                         labelText: "Email",
-                        labelStyle: const TextStyle(color: Colors.grey),
+                        labelStyle: TextStyle(color: Colors.green[800]),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: Colors.orange[50],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -128,12 +128,12 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
                           Icons.lock_outline,
-                          color: Colors.grey,
+                          color: Colors.deepOrange,
                         ),
                         labelText: "Password",
-                        labelStyle: const TextStyle(color: Colors.grey),
+                        labelStyle: TextStyle(color: Colors.green[800]),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: Colors.orange[50],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
@@ -152,12 +152,12 @@ class _LoginPageState extends State<LoginPage> {
 
                     const SizedBox(height: 20),
 
-                    // 🔵 Login Button
+                    // 🔵 Login Button → เปลี่ยนเป็นส้ม + เขียว
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: Colors.green, // ✅ เขียวสด
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -180,6 +180,8 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                       ),
                     ),
+
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
