@@ -18,8 +18,9 @@ class OrderService {
         final table = result["tableNo"];
         final order = result["orderNo"];
 
+        final userUrl = "http://localhost:3000";
         final authUrl =
-            "$baseUrl/api/auth/customer?tableId=$table&orderId=$order";
+            "$userUrl/api/auth/customer?tableId=$table&orderId=$order";
 
         return {
           "success": true,
