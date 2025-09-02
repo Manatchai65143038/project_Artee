@@ -45,7 +45,7 @@ class _StaffPageState extends State<StaffPage> {
     return Scaffold(
       backgroundColor: Colors.orange.shade50, // ✅ พื้นหลังส้มอ่อน
       appBar: AppBar(
-        title: const Text("👨‍💼 Staff Management"),
+        title: const Text("Staff Management"),
         centerTitle: true,
         backgroundColor: Colors.deepOrange, // ✅ หัวส้มเข้ม
       ),

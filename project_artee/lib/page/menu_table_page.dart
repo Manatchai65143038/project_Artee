@@ -43,7 +43,7 @@ class _MenuTablePageState extends State<MenuTablePage> {
     return Scaffold(
       backgroundColor: Colors.orange.shade50, // ✅ พื้นหลังส้มอ่อนทั้งหน้า
       appBar: AppBar(
-        title: const Text("📋 รายการเมนู"),
+        title: const Text("รายการเมนู"),
         centerTitle: true,
         backgroundColor: Colors.deepOrange, // ✅ หัว AppBar สีส้มเข้ม
       ),
