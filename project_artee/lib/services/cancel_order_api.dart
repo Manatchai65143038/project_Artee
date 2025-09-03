@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 // ยังไม่สมบูรณ์
 
 class CancelOrderService {
+  final String url = dotenv.env['API_URL'] ?? '';
   static const String baseUrl =
       "http://10.0.2.2:3000/api/admin/cancel-order"; // 🔹 เปลี่ยนเป็น API จริง
 

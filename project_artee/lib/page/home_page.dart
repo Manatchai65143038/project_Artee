@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/page/cancel_order_page.dart';
 import 'package:project_artee/page/confirm_payment_page.dart';
+import 'package:project_artee/page/detail_order_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/login_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage>
     MenuPage(),
     GenerateQrPage(),
     StaffPage(),
-    CancelOrderPage(),
+    DetailOrderPage(),
     ConfirmPaymentPage(),
   ];
 

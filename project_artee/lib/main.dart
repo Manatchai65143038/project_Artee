@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:project_artee/model/post.dart';
-import 'package:project_artee/page/generate_qr_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_artee/page/home_page.dart';
-import 'package:project_artee/page/login_page.dart';
-import 'package:project_artee/page/menu_page.dart';
-import 'package:project_artee/page/confirm_payment_page.dart';
 
-void main() {
+Future<void> main() async {
+  // โหลด .env จาก root project
+
   runApp(const MyApp());
 }
 
@@ -22,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: LoginPage(),
+      home: HomePage(),
     );
   }
 }
