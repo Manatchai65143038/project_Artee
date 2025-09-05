@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class CancelOrderService {
   final String url = dotenv.env['API_URL'] ?? '';
   static const String baseUrl =
-      "http://10.0.2.2:3000/api/admin/cancel-order"; // 🔹 เปลี่ยนเป็น API จริง
+      "http://10.0.2.2:3000/api/staff/orderDetails"; // 🔹 เปลี่ยนเป็น API จริง
 
   /// ดึงข้อมูลการยกเลิกทั้งหมด
   static Future<List<Map<String, dynamic>>> fetchCancelLogs() async {

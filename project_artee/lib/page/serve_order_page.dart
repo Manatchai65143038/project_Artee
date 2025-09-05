@@ -60,7 +60,7 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
         title: const Text(
-          "📋 ออเดอร์ของลูกค้า",
+          "เสริฟ์อาหาร",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

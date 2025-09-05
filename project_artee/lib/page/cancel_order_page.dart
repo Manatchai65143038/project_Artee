@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_artee/services/cancel_order_api.dart';
-
-// ยังไม่สมบูรณ์
+import '../services/detail_order_api.dart';
 
 class CancelOrderPage extends StatefulWidget {
   const CancelOrderPage({super.key});
@@ -11,67 +9,205 @@ class CancelOrderPage extends StatefulWidget {
 }
 
 class _CancelOrderPageState extends State<CancelOrderPage> {
-  List<Map<String, dynamic>> cancelLogs = [];
-  bool loading = true;
+  late Future<List<DetailOrder>> futureOrders;
+  List<DetailOrder> currentOrders = [];
+  String? selectedType; // ฟิลเตอร์ประเภทอาหาร
 
   @override
   void initState() {
     super.initState();
-    loadCancelLogs();
+    futureOrders = DetailOrderService.fetchDetailOrders();
+    _loadOrders();
   }
 
-  Future<void> loadCancelLogs() async {
+  Future<void> _loadOrders() async {
     try {
-      final data = await CancelOrderService.fetchCancelLogs();
+      final orders = await futureOrders;
       if (!mounted) return;
       setState(() {
-        cancelLogs = List<Map<String, dynamic>>.from(data);
-        loading = false;
+        // Filter เฉพาะ trackOrderID = 2 (ready to serve)
+        currentOrders = orders.where((o) => o.trackOrderID == 2).toList();
       });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("โหลดข้อมูลล้มเหลว: $e")));
+    } catch (_) {
+      // ไม่แสดง SnackBar
+    }
+  }
+
+  Future<void> _cancelOrder(DetailOrder order) async {
+    bool success = await DetailOrderService.updateTrack(order.detailNo, 5);
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        currentOrders.removeWhere((o) => o.detailNo == order.detailNo);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // ดึงประเภทเมนูทั้งหมดจาก currentOrders
+    final types = currentOrders.map((o) => o.menuType).toSet().toList();
+
+    // กรองออร์เดอร์ตามประเภทที่เลือก
+    final filteredOrders =
+        selectedType == null
+            ? currentOrders
+            : currentOrders.where((o) => o.menuType == selectedType).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("บันทึกการยกเลิกออเดอร์")),
-      body:
-          cancelLogs.isEmpty
-              ? const Center(child: Text("ไม่มีข้อมูลการยกเลิก"))
-              : ListView.builder(
-                itemCount: cancelLogs.length,
-                itemBuilder: (context, index) {
-                  final log = cancelLogs[index];
-                  return Card(
-                    margin: const EdgeInsets.all(8),
-                    child: ListTile(
-                      title: Text(
-                        "OrderNo: ${log['orderNo']} | DetailNo: ${log['detailNo']}",
-                      ),
-                      subtitle: Text(
-                        "เหตุผล: ${log['description']}\nผู้ยกเลิก: ${log['cancelBy']}",
-                      ),
-                      trailing: Text(
-                        log['createAt'] ?? "",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  );
+      backgroundColor: Colors.orange[50],
+      appBar: AppBar(
+        backgroundColor: Colors.deepOrange,
+        title: const Text(
+          "จัดการออเดอร์",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // Dropdown ฟิลเตอร์ประเภทอาหาร
+          if (types.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                hint: const Text("เลือกประเภทอาหาร"),
+                value: selectedType,
+                items: [
+                  const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
+                  ...types.map(
+                    (type) =>
+                        DropdownMenuItem(value: type, child: Text(type ?? "-")),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    selectedType = value;
+                  });
                 },
               ),
+            ),
+
+          // ตารางออร์เดอร์
+          Expanded(
+            child:
+                filteredOrders.isEmpty
+                    ? const Center(child: Text("ไม่มีออเดอร์"))
+                    : LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: constraints.maxWidth,
+                            ),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.green[200]!,
+                                ),
+                                columnSpacing: 12,
+                                dataRowHeight: 70,
+                                columns: const [
+                                  DataColumn(label: Text("ลำดับ")),
+                                  DataColumn(label: Text("เมนู")),
+                                  DataColumn(label: Text("ประเภท")),
+                                  DataColumn(label: Text("จำนวน")),
+                                  DataColumn(label: Text("โต๊ะ")),
+                                  DataColumn(label: Text("คำขอเพิ่มเติม")),
+                                  DataColumn(label: Text("สถานที่")),
+                                  DataColumn(label: Text("จัดการ")),
+                                ],
+                                rows:
+                                    filteredOrders.map((order) {
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(
+                                            Text(order.detailNo.toString()),
+                                          ),
+                                          DataCell(
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  child: Image.network(
+                                                    order.menuImage ?? "",
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stack,
+                                                        ) => const Icon(
+                                                          Icons.fastfood,
+                                                        ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Flexible(
+                                                  child: Text(
+                                                    order.menuName ?? "",
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.deepOrange,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          DataCell(Text(order.menuType ?? "")),
+                                          DataCell(
+                                            Text(order.amount.toString()),
+                                          ),
+                                          DataCell(
+                                            Text(order.tableNo.toString()),
+                                          ),
+                                          DataCell(
+                                            Text(order.description ?? ""),
+                                          ),
+                                          DataCell(Text(order.place ?? "")),
+                                          DataCell(
+                                            ElevatedButton.icon(
+                                              icon: const Icon(
+                                                Icons.cancel,
+                                                size: 18,
+                                              ),
+                                              label: const Text("ยกเลิก"),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8,
+                                                    ),
+                                              ),
+                                              onPressed:
+                                                  () => _cancelOrder(order),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+          ),
+        ],
+      ),
     );
   }
 }
