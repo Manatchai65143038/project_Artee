@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage>
     "เมนู",
     "QR Code",
     "โปรไฟล์",
-    "ยกเลิก",
+    "`ออเดอร์",
     "ชำระเงิน",
   ];
 
@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage>
     GenerateQrPage(),
     StaffPage(),
     DetailOrderPage(),
-    ConfirmPaymentPage(),
+    CancelOrderPage(),
   ];
 
   @override

@@ -24,11 +24,13 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   Future<void> _loadOrders() async {
     try {
       final orders = await futureOrders;
+      if (!mounted) return;
       setState(() {
-        // ✅ Filter เฉพาะ trackOrderID = 1
+        // Filter เฉพาะ trackOrderID = 1
         currentOrders = orders.where((o) => o.trackOrderID == 1).toList();
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("เกิดข้อผิดพลาดโหลดออเดอร์: $e")));
@@ -36,8 +38,9 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
   }
 
   Future<void> _acceptOrder(DetailOrder order) async {
-    // trackId = 2 สำหรับ "รับออเดอร์"
     bool success = await DetailOrderService.updateTrack(order.detailNo, 2);
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -46,7 +49,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
         ),
       );
       setState(() {
-        // ✅ ลบออกจาก currentOrders
         currentOrders.removeWhere((o) => o.detailNo == order.detailNo);
       });
     } else {
@@ -61,7 +63,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ดึงประเภทเมนูไม่ซ้ำ สำหรับฟิลเตอร์
     final menuTypes = currentOrders.map((o) => o.menuType).toSet().toList();
     final filteredOrders =
         selectedMenuType == null
@@ -82,7 +83,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       ),
       body: Column(
         children: [
-          // Dropdown filter
           if (menuTypes.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -103,83 +103,83 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                 },
               ),
             ),
-
-          // ตารางออเดอร์
           Expanded(
             child:
                 filteredOrders.isEmpty
                     ? const Center(child: Text("ไม่มีออเดอร์"))
                     : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minWidth: MediaQuery.of(context).size.width,
+                      child: DataTable(
+                        headingRowColor: MaterialStateColor.resolveWith(
+                          (states) => Colors.green[200]!,
                         ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: DataTable(
-                            headingRowColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.green[200]!,
-                            ),
-                            columnSpacing: 12,
-                            columns: const [
-                              DataColumn(label: Text("ลำดับ")),
-                              DataColumn(label: Text("เมนู")),
-                              DataColumn(label: Text("ประเภท")),
-                              DataColumn(label: Text("จำนวน")),
-                              DataColumn(label: Text("โต๊ะ")),
-                              DataColumn(label: Text("จัดการ")),
-                            ],
-                            rows:
-                                filteredOrders.map((order) {
-                                  return DataRow(
-                                    cells: [
-                                      DataCell(Text(order.detailNo.toString())),
-                                      DataCell(
-                                        Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Image.network(
-                                                order.menuImage,
-                                                width: 40,
-                                                height: 40,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            SizedBox(
-                                              width: 100,
-                                              child: Text(
-                                                order.menuName,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.deepOrange,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      DataCell(Text(order.menuType)),
-                                      DataCell(Text(order.amount.toString())),
-                                      DataCell(Text(order.tableNo.toString())),
-                                      DataCell(
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
+                        columnSpacing: 12,
+                        dataRowHeight: 70,
+                        columns: const [
+                          DataColumn(label: Text("ลำดับ")),
+                          DataColumn(label: Text("เมนู")),
+                          DataColumn(label: Text("ประเภท")),
+                          DataColumn(label: Text("จำนวน")),
+                          DataColumn(label: Text("โต๊ะ")),
+                          DataColumn(label: Text("จัดการ")),
+                        ],
+                        rows:
+                            filteredOrders.map((order) {
+                              return DataRow(
+                                cells: [
+                                  DataCell(Text(order.detailNo.toString())),
+                                  DataCell(
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            6,
                                           ),
-                                          child: const Text("รับออเดอร์"),
-                                          onPressed: () => _acceptOrder(order),
+                                          child: Image.network(
+                                            order.menuImage,
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stack) =>
+                                                    const Icon(Icons.fastfood),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        SizedBox(
+                                          width: 120,
+                                          child: Text(
+                                            order.menuName,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.deepOrange,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  DataCell(Text(order.menuType)),
+                                  DataCell(Text(order.amount.toString())),
+                                  DataCell(Text(order.tableNo.toString())),
+                                  DataCell(
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
                                         ),
                                       ),
-                                    ],
-                                  );
-                                }).toList(),
-                          ),
-                        ),
+                                      child: const Text("รับออเดอร์"),
+                                      onPressed: () => _acceptOrder(order),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
                       ),
                     ),
           ),
