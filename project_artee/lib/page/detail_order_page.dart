@@ -26,7 +26,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       final orders = await futureOrders;
       if (!mounted) return;
       setState(() {
-        // Filter เฉพาะ trackOrderID = 1
         currentOrders = orders.where((o) => o.trackOrderID == 1).toList();
       });
     } catch (e) {
@@ -107,80 +106,106 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
             child:
                 filteredOrders.isEmpty
                     ? const Center(child: Text("ไม่มีออเดอร์"))
-                    : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        headingRowColor: MaterialStateColor.resolveWith(
-                          (states) => Colors.green[200]!,
-                        ),
-                        columnSpacing: 12,
-                        dataRowHeight: 70,
-                        columns: const [
-                          DataColumn(label: Text("ลำดับ")),
-                          DataColumn(label: Text("เมนู")),
-                          DataColumn(label: Text("ประเภท")),
-                          DataColumn(label: Text("จำนวน")),
-                          DataColumn(label: Text("โต๊ะ")),
-                          DataColumn(label: Text("จัดการ")),
-                        ],
-                        rows:
-                            filteredOrders.map((order) {
-                              return DataRow(
-                                cells: [
-                                  DataCell(Text(order.detailNo.toString())),
-                                  DataCell(
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            6,
+                    : LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: constraints.maxWidth,
+                            ),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: DataTable(
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.green[200]!,
+                                ),
+                                columnSpacing: 12,
+                                dataRowHeight: 70,
+                                columns: const [
+                                  DataColumn(label: Text("ลำดับ")),
+                                  DataColumn(label: Text("เมนู")),
+                                  DataColumn(label: Text("ประเภท")),
+                                  DataColumn(label: Text("จำนวน")),
+                                  DataColumn(label: Text("โต๊ะ")),
+                                  DataColumn(label: Text("จัดการ")),
+                                ],
+                                rows:
+                                    filteredOrders.map((order) {
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(
+                                            Text(order.detailNo.toString()),
                                           ),
-                                          child: Image.network(
-                                            order.menuImage,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stack) =>
-                                                    const Icon(Icons.fastfood),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        SizedBox(
-                                          width: 120,
-                                          child: Text(
-                                            order.menuName,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.deepOrange,
+                                          DataCell(
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  child: Image.network(
+                                                    order.menuImage,
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stack,
+                                                        ) => const Icon(
+                                                          Icons.fastfood,
+                                                        ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                SizedBox(
+                                                  width: 120,
+                                                  child: Text(
+                                                    order.menuName,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.deepOrange,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  DataCell(Text(order.menuType)),
-                                  DataCell(Text(order.amount.toString())),
-                                  DataCell(Text(order.tableNo.toString())),
-                                  DataCell(
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                      ),
-                                      child: const Text("รับออเดอร์"),
-                                      onPressed: () => _acceptOrder(order),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                      ),
+                                          DataCell(Text(order.menuType)),
+                                          DataCell(
+                                            Text(order.amount.toString()),
+                                          ),
+                                          DataCell(
+                                            Text(order.tableNo.toString()),
+                                          ),
+                                          DataCell(
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8,
+                                                    ),
+                                              ),
+                                              child: const Text("รับออเดอร์"),
+                                              onPressed:
+                                                  () => _acceptOrder(order),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
           ),
         ],

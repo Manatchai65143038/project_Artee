@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage>
     "เมนู",
     "QR Code",
     "โปรไฟล์",
-    "`ออเดอร์",
+    "รับออเดอร์",
     "ชำระเงิน",
   ];
 
