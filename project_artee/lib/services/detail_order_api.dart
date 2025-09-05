@@ -12,6 +12,8 @@ class DetailOrder {
   final double totalCost;
   final DateTime dateTime;
   final DateTime updateAT;
+  final String description;
+  final String place;
   final String trackStateName;
   final int tableNo;
   final String menuName;
@@ -28,6 +30,8 @@ class DetailOrder {
     required this.totalCost,
     required this.dateTime,
     required this.updateAT,
+    required this.description,
+    required this.place,
     required this.trackStateName,
     required this.tableNo,
     required this.menuName,
@@ -46,6 +50,8 @@ class DetailOrder {
       totalCost: double.tryParse(json["totalCost"].toString()) ?? 0.0,
       dateTime: DateTime.parse(json["dateTime"]),
       updateAT: DateTime.parse(json["updateAT"]),
+      description: json["description"],
+      place: json["place"],
       trackStateName: json["track"]["trackStateName"],
       tableNo: json["order"]["tableNo"],
       menuName: json["menu"]["name"],

@@ -1,15 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:project_artee/services/detail_order_api.dart';
+import '../services/detail_order_api.dart';
 
-class DetailOrderPage extends StatefulWidget {
-  const DetailOrderPage({super.key});
+class ServeOrderPage extends StatefulWidget {
+  const ServeOrderPage({super.key});
 
   @override
-  State<DetailOrderPage> createState() => _DetailOrderPageState();
+  State<ServeOrderPage> createState() => _ServeOrderPageState();
 }
 
-class _DetailOrderPageState extends State<DetailOrderPage> {
+class _ServeOrderPageState extends State<ServeOrderPage> {
   late Future<List<DetailOrder>> futureOrders;
   List<DetailOrder> currentOrders = [];
 
@@ -25,38 +24,21 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       final orders = await futureOrders;
       if (!mounted) return;
       setState(() {
-        // Filter เฉพาะ trackOrderID = 1
-        currentOrders = orders.where((o) => o.trackOrderID == 1).toList();
+        currentOrders = orders.where((o) => o.trackOrderID == 2).toList();
       });
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("เกิดข้อผิดพลาดโหลดออเดอร์: $e")));
+    } catch (_) {
+      // ไม่แสดง SnackBar
     }
   }
 
-  Future<void> _acceptOrder(DetailOrder order) async {
-    bool success = await DetailOrderService.updateTrack(order.detailNo, 2);
+  Future<void> _serveOrder(DetailOrder order) async {
+    bool success = await DetailOrderService.updateTrack(order.detailNo, 3);
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green[600],
-          content: Text("✅ รับออเดอร์ ${order.detailNo} สำเร็จ"),
-        ),
-      );
       setState(() {
         currentOrders.removeWhere((o) => o.detailNo == order.detailNo);
       });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red[400],
-          content: const Text("❌ รับออเดอร์ไม่สำเร็จ"),
-        ),
-      );
     }
   }
 
@@ -86,11 +68,11 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: DataTable(
+                          columnSpacing: 12,
+                          dataRowHeight: 70,
                           headingRowColor: MaterialStateColor.resolveWith(
                             (states) => Colors.green[200]!,
                           ),
-                          columnSpacing: 12,
-                          dataRowHeight: 70,
                           columns: const [
                             DataColumn(label: Text("ลำดับ")),
                             DataColumn(label: Text("เมนู")),
@@ -144,34 +126,23 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                                     DataCell(Text(order.menuType ?? "")),
                                     DataCell(Text(order.amount.toString())),
                                     DataCell(Text(order.tableNo.toString())),
-                                    DataCell(
-                                      SizedBox(
-                                        width: 200,
-                                        child: Text(
-                                          order.description ?? "",
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ),
+                                    DataCell(Text(order.description ?? "")),
                                     DataCell(Text(order.place ?? "")),
                                     DataCell(
                                       ElevatedButton.icon(
-                                        icon: const Icon(Icons.restaurant),
-                                        label: const Text("รับออร์เดอร์"),
+                                        icon: const Icon(
+                                          Icons.restaurant,
+                                          size: 18,
+                                        ),
+                                        label: const Text("เสิร์ฟ"),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color.fromARGB(
-                                            255,
-                                            24,
-                                            155,
-                                            76,
-                                          ),
+                                          backgroundColor: Colors.orange,
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 12,
                                             vertical: 8,
                                           ),
                                         ),
-                                        onPressed: () => _acceptOrder(order),
+                                        onPressed: () => _serveOrder(order),
                                       ),
                                     ),
                                   ],

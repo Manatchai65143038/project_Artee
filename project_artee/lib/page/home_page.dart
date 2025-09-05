@@ -5,6 +5,7 @@ import 'package:project_artee/page/detail_order_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/login_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
+import 'package:project_artee/page/serve_order_page.dart';
 import 'package:project_artee/page/staff_page.dart';
 import 'menu_page.dart';
 
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage>
     "QR Code",
     "โปรไฟล์",
     "รับออเดอร์",
-    "ชำระเงิน",
+    "เสิร์ฟอาหาร",
   ];
 
   final List<IconData> _tabIcons = [
@@ -33,7 +34,8 @@ class _HomePageState extends State<HomePage>
     Icons.fastfood,
     Icons.qr_code,
     Icons.person,
-    Icons.cancel,
+    Icons.fastfood,
+    Icons.restaurant,
     Icons.payment,
   ];
 
@@ -43,6 +45,7 @@ class _HomePageState extends State<HomePage>
     GenerateQrPage(),
     StaffPage(),
     DetailOrderPage(),
+    ServeOrderPage(),
     CancelOrderPage(),
   ];
 
