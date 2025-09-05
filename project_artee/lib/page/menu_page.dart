@@ -12,6 +12,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   List<dynamic> menus = [];
   bool loading = true;
+  String? selectedType; // ✅ ต้องเป็น nullable
 
   @override
   void initState() {
@@ -60,6 +61,16 @@ class _MenuPageState extends State<MenuPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // ✅ ดึงประเภทเมนูทั้งหมด
+    final menuTypes =
+        menus.map((m) => m['type']?['name'] ?? "").toSet().toList();
+
+    // ✅ กรองเมนูตามประเภทที่เลือก
+    final filteredMenus =
+        selectedType == null
+            ? menus
+            : menus.where((m) => m['type']?['name'] == selectedType).toList();
+
     return Scaffold(
       backgroundColor: Colors.orange[50], // ✅ พื้นหลังส้มอ่อน
       appBar: AppBar(
@@ -74,79 +85,114 @@ class _MenuPageState extends State<MenuPage> {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child:
-              menus.isEmpty
-                  ? const Center(
-                    child: Text(
-                      "ไม่มีเมนู",
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
+          child: Column(
+            children: [
+              // ✅ ฟิลเตอร์ประเภทอาหาร
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: DropdownButton<String?>(
+                  isExpanded: true,
+                  hint: const Text("เลือกประเภทอาหาร"),
+                  value: selectedType,
+                  items: [
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text("ทั้งหมด"),
                     ),
-                  )
-                  : ListView.builder(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: menus.length,
-                    itemBuilder: (context, index) {
-                      final menu = menus[index];
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 5,
-                        shadowColor: Colors.green.withOpacity(
-                          0.3,
-                        ), // ✅ เงาเขียว
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              menu['image'] ?? "",
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (context, error, stackTrace) => Container(
+                    ...menuTypes.map(
+                      (type) => DropdownMenuItem<String?>(
+                        value: type,
+                        child: Text(type),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedType = value;
+                    });
+                  },
+                ),
+              ),
+
+              // ✅ แสดงรายการเมนู
+              Expanded(
+                child:
+                    filteredMenus.isEmpty
+                        ? const Center(
+                          child: Text(
+                            "ไม่มีเมนู",
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                        )
+                        : ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: filteredMenus.length,
+                          itemBuilder: (context, index) {
+                            final menu = filteredMenus[index];
+                            return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 5,
+                              shadowColor: Colors.green.withOpacity(0.3),
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(12),
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    menu['image'] ?? "",
                                     width: 70,
                                     height: 70,
-                                    color: Colors.orange[100],
-                                    child: const Icon(
-                                      Icons.fastfood,
-                                      color: Colors.green,
-                                      size: 30,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              color: Colors.orange[100],
+                                              child: const Icon(
+                                                Icons.fastfood,
+                                                color: Colors.green,
+                                                size: 30,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                                title: Text(
+                                  menu['name'] ?? "",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepOrange,
+                                  ),
+                                ),
+                                subtitle: Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    "ราคา: ${menu['price']} บาท",
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black54,
                                     ),
                                   ),
-                            ),
-                          ),
-                          title: Text(
-                            menu['name'] ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange, // ✅ หัวข้อส้ม
-                            ),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              "ราคา: ${menu['price']} บาท",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black54, // ✅ หัวข้อดํา
+                                ),
+                                trailing: Switch(
+                                  activeColor: Colors.blue,
+                                  value: menu['isAvailable'] == true,
+                                  onChanged:
+                                      (value) => toggleAvailability(
+                                        menu['menuID'],
+                                        value,
+                                      ),
+                                ),
                               ),
-                            ),
-                          ),
-                          trailing: Switch(
-                            activeColor: Colors.blue, // ✅ Switch ฟ้า
-                            value: menu['isAvailable'] == true,
-                            onChanged:
-                                (value) =>
-                                    toggleAvailability(menu['menuID'], value),
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+              ),
+            ],
+          ),
         ),
       ),
     );

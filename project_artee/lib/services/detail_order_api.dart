@@ -91,4 +91,6 @@ class DetailOrderService {
       return false;
     }
   }
+
+  static acceptOrder(int detailNo) {}
 }
