@@ -25,9 +25,10 @@ class _HomePageState extends State<HomePage>
     "เมนู",
     "QR Code",
     "โปรไฟล์",
-    "รับออเดอร์",
-    "เสิร์ฟอาหาร",
+    "ออเดอร์",
+    "เสิร์ฟ",
     "ยกเลิก",
+    "ชำระเงิน",
   ];
 
   final List<IconData> _tabIcons = [
@@ -49,7 +50,7 @@ class _HomePageState extends State<HomePage>
     DetailOrderPage(),
     ServeOrderPage(),
     CancelOrderPage(),
-    // ConfirmPaymentPage(),
+    ConfirmPaymentPage(),
   ];
 
   @override

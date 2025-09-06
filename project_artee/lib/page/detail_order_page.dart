@@ -77,7 +77,7 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
         title: const Text(
-          "📋 ออเดอร์ของลูกค้า",
+          "ออเดอร์ของลูกค้า",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

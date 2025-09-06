@@ -54,7 +54,7 @@ class _MenuTablePageState extends State<MenuTablePage> {
       backgroundColor: Colors.orange.shade50,
       appBar: AppBar(
         title: const Text(
-          "🍲 รายการเมนูอาหาร",
+          "รายการเมนูอาหาร",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
