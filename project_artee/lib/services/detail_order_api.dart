@@ -63,6 +63,8 @@ class DetailOrder {
 
 class DetailOrderService {
   static final String baseUrl = "http://10.0.2.2:3000/api/staff/orderDetails";
+  static final String cancelUrl =
+      "http://10.0.2.2:3000/api/customer/cancelOrder";
 
   static Future<List<DetailOrder>> fetchDetailOrders() async {
     final response = await http.get(Uri.parse(baseUrl));
@@ -98,5 +100,34 @@ class DetailOrderService {
     }
   }
 
-  static acceptOrder(int detailNo) {}
+  static Future<bool> cancelOrder({
+    required int detailNo,
+    required int orderNo,
+    required String description,
+    required String cancelBy,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(cancelUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "detailNo": detailNo,
+          "orderNo": orderNo,
+          "description": description,
+          "cancelBy": cancelBy,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Cancel order success: ${response.body}");
+        return true;
+      } else {
+        print("Cancel order failed: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Cancel order exception: $e");
+      return false;
+    }
+  }
 }

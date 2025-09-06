@@ -34,13 +34,73 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
   }
 
   Future<void> _cancelOrder(DetailOrder order) async {
-    bool success = await DetailOrderService.updateTrack(order.detailNo, 5);
+    TextEditingController descriptionController = TextEditingController();
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text("ยกเลิกออเดอร์"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("กรุณาระบุเหตุผลการยกเลิก:"),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descriptionController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "ระบุเหตุผล...",
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("ยกเลิก"),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text("ตกลง"),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm != true) return;
+
+    final description = descriptionController.text.trim();
+    if (description.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("กรุณากรอกเหตุผลการยกเลิก")));
+      return;
+    }
+
+    // เรียก cancelOrder service
+    bool success = await DetailOrderService.cancelOrder(
+      detailNo: order.detailNo,
+      orderNo: order.orderNo,
+      description: description,
+      cancelBy: "staff",
+    );
+
     if (!mounted) return;
 
     if (success) {
       setState(() {
         currentOrders.removeWhere((o) => o.detailNo == order.detailNo);
       });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("ยกเลิกออเดอร์สำเร็จ")));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("ยกเลิกออเดอร์ไม่สำเร็จ")));
     }
   }
 
