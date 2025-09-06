@@ -35,44 +35,86 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
 
   Future<void> _cancelOrder(DetailOrder order) async {
     TextEditingController descriptionController = TextEditingController();
+    List<String> cancelReasons = [
+      "ทำผิดเมนู",
+      "ลูกค้ายกเลิก",
+      "วัตถุดิบหมด",
+      "เหตุผลอื่น ๆ",
+    ];
+    List<String> selectedReasons = [];
 
     final confirm = await showDialog<bool>(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: const Text("ยกเลิกออเดอร์"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text("กรุณาระบุเหตุผลการยกเลิก:"),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descriptionController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "ระบุเหตุผล...",
+          (context) => StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: const Text("ยกเลิกออเดอร์"),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("เลือกเหตุผลการยกเลิก:"),
+                      const SizedBox(height: 8),
+
+                      // ✅ Checkbox เหตุผลสำเร็จรูป
+                      ...cancelReasons.map((reason) {
+                        return CheckboxListTile(
+                          value: selectedReasons.contains(reason),
+                          title: Text(reason),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          onChanged: (checked) {
+                            setState(() {
+                              if (checked == true) {
+                                selectedReasons.add(reason);
+                              } else {
+                                selectedReasons.remove(reason);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+
+                      const Divider(),
+                      const Text("เหตุผลเพิ่มเติม:"),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: descriptionController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "ระบุเหตุผลเพิ่มเติม...",
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text("ยกเลิก"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text("ตกลง"),
-              ),
-            ],
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("ยกเลิก"),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text("ตกลง"),
+                  ),
+                ],
+              );
+            },
           ),
     );
 
     if (confirm != true) return;
 
-    final description = descriptionController.text.trim();
+    // ✅ รวมเหตุผลจาก checkbox + textfield
+    final description = [
+      ...selectedReasons,
+      descriptionController.text.trim(),
+    ].where((e) => e.isNotEmpty).join(" | ");
+
     if (description.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -85,7 +127,7 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
       detailNo: order.detailNo,
       orderNo: order.orderNo,
       description: description,
-      cancelBy: "staff",
+      cancelBy: "พนักงาน",
     );
 
     if (!mounted) return;
