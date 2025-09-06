@@ -154,29 +154,41 @@ class _HomePageState extends State<HomePage>
               isDesktop
                   ? Row(
                     children: [
-                      NavigationRail(
-                        backgroundColor: Colors.white.withOpacity(0.95),
-                        selectedIndex: _tabController.index,
-                        onDestinationSelected:
-                            (index) => setState(() {
-                              _tabController.index = index;
-                            }),
-                        labelType: NavigationRailLabelType.all,
-                        selectedIconTheme: const IconThemeData(
-                          color: secondaryOrange,
-                        ),
-                        selectedLabelTextStyle: const TextStyle(
-                          color: secondaryOrange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        unselectedIconTheme: const IconThemeData(
-                          color: primaryGreen,
-                        ),
-                        destinations: List.generate(
-                          _tabTitles.length,
-                          (index) => NavigationRailDestination(
-                            icon: Icon(_tabIcons[index]),
-                            label: Text(_tabTitles[index]),
+                      // ✅ จำกัดความกว้าง NavigationRail ไม่ให้บานเกิน
+                      SizedBox(
+                        width: 72, // กำหนดความกว้างตายตัว
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height,
+                            ),
+                            child: NavigationRail(
+                              backgroundColor: Colors.white.withOpacity(0.95),
+                              selectedIndex: _tabController.index,
+                              onDestinationSelected: (index) {
+                                setState(() {
+                                  _tabController.index = index;
+                                });
+                              },
+                              labelType: NavigationRailLabelType.all,
+                              selectedIconTheme: const IconThemeData(
+                                color: secondaryOrange,
+                              ),
+                              selectedLabelTextStyle: const TextStyle(
+                                color: secondaryOrange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              unselectedIconTheme: const IconThemeData(
+                                color: primaryGreen,
+                              ),
+                              destinations: List.generate(
+                                _tabTitles.length,
+                                (index) => NavigationRailDestination(
+                                  icon: Icon(_tabIcons[index]),
+                                  label: Text(_tabTitles[index]),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
