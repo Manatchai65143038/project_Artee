@@ -206,7 +206,13 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                                               icon: const Icon(
                                                 Icons.restaurant,
                                               ),
-                                              label: const Text("รับออร์เดอร์"),
+                                              label: const Text(
+                                                "รับออร์เดอร์",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
                                                     const Color.fromARGB(

@@ -183,7 +183,13 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
                                                 Icons.cancel,
                                                 size: 18,
                                               ),
-                                              label: const Text("ยกเลิก"),
+                                              label: const Text(
+                                                "ยกเลิก",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
                                                 padding:

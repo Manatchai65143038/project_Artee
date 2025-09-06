@@ -183,7 +183,13 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
                                                 Icons.restaurant,
                                                 size: 18,
                                               ),
-                                              label: const Text("เสิร์ฟ"),
+                                              label: const Text(
+                                                "เสิร์ฟ",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.orange,
                                                 padding:
