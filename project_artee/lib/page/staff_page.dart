@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/staff_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StaffPage extends StatefulWidget {
   const StaffPage({super.key});
@@ -12,6 +13,7 @@ class _StaffPageState extends State<StaffPage> {
   List<dynamic> staffs = [];
   bool loading = true;
   String? errorMessage;
+  String? myStaffID; // ✅ เก็บ staffID ที่ login
 
   @override
   void initState() {
@@ -19,24 +21,33 @@ class _StaffPageState extends State<StaffPage> {
     loadStaffs();
   }
 
-  /// โหลดข้อมูล Staff
+  /// โหลดข้อมูล Staff + Filter ตาม staffID
   Future<void> loadStaffs() async {
-    if (!mounted) return; // ✅ กัน setState หลัง dispose
+    if (!mounted) return;
     setState(() {
       loading = true;
       errorMessage = null;
     });
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+      myStaffID = prefs.getString("staffID");
+
       final data = await StaffService.fetchStaffs();
 
-      if (!mounted) return; // ✅ กัน setState หลัง dispose
+      List<dynamic> filtered = data;
+      if (myStaffID != null && myStaffID!.isNotEmpty) {
+        filtered =
+            data.where((s) => s["staffID"].toString() == myStaffID).toList();
+      }
+
+      if (!mounted) return;
       setState(() {
-        staffs = data;
+        staffs = filtered;
         loading = false;
       });
     } catch (e) {
-      if (!mounted) return; // ✅ กัน setState หลัง dispose
+      if (!mounted) return;
       setState(() {
         loading = false;
         errorMessage = e.toString();
@@ -47,14 +58,14 @@ class _StaffPageState extends State<StaffPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange.shade50, // ✅ พื้นหลังส้มอ่อน
+      backgroundColor: Colors.orange.shade50,
       appBar: AppBar(
         title: const Text(
           "Staff Management",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepOrange, // ✅ หัวส้มเข้ม
+        backgroundColor: Colors.deepOrange,
         elevation: 4,
       ),
       body:
@@ -68,48 +79,9 @@ class _StaffPageState extends State<StaffPage> {
     );
   }
 
-  /// แสดง error
-  Widget _buildErrorWidget() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline, color: Colors.red.shade400, size: 60),
-          const SizedBox(height: 12),
-          Text(
-            errorMessage!,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.black87, fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: loadStaffs,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            label: const Text("ลองใหม่", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildErrorWidget() => Center(child: Text(errorMessage ?? "Error"));
+  Widget _buildEmptyWidget() => const Center(child: Text("ไม่มีข้อมูลพนักงาน"));
 
-  /// กรณีไม่มีข้อมูล
-  Widget _buildEmptyWidget() {
-    return const Center(
-      child: Text(
-        "ไม่มีข้อมูลพนักงาน",
-        style: TextStyle(fontSize: 18, color: Colors.black54),
-      ),
-    );
-  }
-
-  /// แสดง List ของ Staff
   Widget _buildStaffList() {
     return ListView.builder(
       padding: const EdgeInsets.all(12),
@@ -117,41 +89,16 @@ class _StaffPageState extends State<StaffPage> {
       itemBuilder: (context, index) {
         final staff = staffs[index];
         return Card(
-          color: Colors.white,
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          margin: const EdgeInsets.symmetric(vertical: 8),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
             leading: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.green.shade200, // ✅ กรอบเขียวอ่อน
-              child: CircleAvatar(
-                radius: 25,
-                backgroundImage: NetworkImage(
-                  staff['image'] != null && staff['image'] != ""
-                      ? staff['image']
-                      : "https://via.placeholder.com/150",
-                ),
+              backgroundImage: NetworkImage(
+                staff['image'] != null && staff['image'] != ""
+                    ? staff['image']
+                    : "https://via.placeholder.com/150",
               ),
             ),
-            title: Text(
-              "${staff['name']} ${staff['surname']}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.deepOrange,
-                fontSize: 16,
-              ),
-            ),
-            subtitle: Text(
-              staff['email'] ?? "-",
-              style: const TextStyle(color: Colors.black54, fontSize: 14),
-            ),
+            title: Text("${staff['name']} ${staff['surname']}"),
+            subtitle: Text(staff['email'] ?? "-"),
           ),
         );
       },

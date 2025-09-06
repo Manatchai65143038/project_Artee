@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:project_artee/page/home_page.dart';
+import 'package:project_artee/page/login_page.dart';
 
 Future<void> main() async {
   // โหลด .env จาก root project
