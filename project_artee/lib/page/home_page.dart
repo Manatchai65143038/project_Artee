@@ -4,6 +4,7 @@ import 'package:project_artee/page/confirm_payment_page.dart';
 import 'package:project_artee/page/detail_order_page.dart';
 import 'package:project_artee/page/generate_qr_page.dart';
 import 'package:project_artee/page/login_page.dart';
+import 'package:project_artee/page/logout_page.dart';
 import 'package:project_artee/page/menu_table_page.dart';
 import 'package:project_artee/page/serve_order_page.dart';
 import 'package:project_artee/page/staff_page.dart';
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage>
     "เสิร์ฟ",
     "ยกเลิก",
     "ชำระเงิน",
+    "Logout",
   ];
 
   final List<IconData> _tabIcons = [
@@ -40,6 +42,7 @@ class _HomePageState extends State<HomePage>
     Icons.restaurant,
     Icons.cancel,
     Icons.payment,
+    Icons.logout,
   ];
 
   final List<Widget> _pages = const [
@@ -51,39 +54,13 @@ class _HomePageState extends State<HomePage>
     ServeOrderPage(),
     CancelOrderPage(),
     ConfirmPaymentPage(),
+    LogoutPage(),
   ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _pages.length, vsync: this);
-  }
-
-  void _logout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Logout'),
-            content: const Text('คุณต้องการออกจากระบบหรือไม่?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('ยกเลิก'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
-                },
-                child: const Text('ตกลง'),
-              ),
-            ],
-          ),
-    );
   }
 
   @override
@@ -106,7 +83,7 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Colors.white.withOpacity(0.9),
         elevation: 3,
         title: const Text(
-          "Restaurant Atree",
+          "Atree",
           style: TextStyle(
             color: primaryGreen,
             fontWeight: FontWeight.bold,
@@ -114,13 +91,6 @@ class _HomePageState extends State<HomePage>
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: primaryGreen),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-            color: primaryGreen,
-          ),
-        ],
         bottom:
             isDesktop
                 ? null
