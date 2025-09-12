@@ -1,103 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/confirm_payment_api.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:project_artee/widgets/Calculate_widget.dart';
 
-class ConfirmPaymentPage extends StatefulWidget {
-  const ConfirmPaymentPage({super.key});
+class PaymentPage extends StatefulWidget {
+  const PaymentPage({super.key});
 
   @override
-  State<ConfirmPaymentPage> createState() => _ConfirmPaymentPageState();
+  State<PaymentPage> createState() => _PaymentPageState();
 }
 
-class _ConfirmPaymentPageState extends State<ConfirmPaymentPage> {
-  List<Map<String, dynamic>> payments = [];
-  bool loading = true;
+class _PaymentPageState extends State<PaymentPage> {
+  late Future<List<Payment>> futurePayments;
 
   @override
   void initState() {
     super.initState();
-    loadPayments();
+    futurePayments = PaymentService.fetchPayments();
   }
 
-  Future<void> loadPayments() async {
-    try {
-      final data = await PaymentService.fetchPayments();
-      setState(() {
-        payments = data.where((p) => p['status'] == "PENDING").toList();
-        loading = false;
-      });
-    } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("โหลดข้อมูลล้มเหลว: $e")));
-    }
+  void refreshPayments() {
+    setState(() {
+      futurePayments = PaymentService.fetchPayments();
+    });
   }
 
-  Future<void> confirmPayment(int id) async {
-    try {
-      await PaymentService.updateStatus(id, "CONFIRMED");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("ยืนยันการชำระเงินสำเร็จ")));
-      loadPayments();
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("ไม่สามารถยืนยันได้: $e")));
-    }
-  }
-
-  Future<void> cancelPayment(int id) async {
-    try {
-      await PaymentService.updateStatus(id, "CANCELLED");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("ยกเลิกการชำระเงินเรียบร้อย")),
-      );
-      loadPayments();
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("ไม่สามารถยกเลิกได้: $e")));
-    }
+  void showImageDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog(
+            child: SizedBox(
+              width: double.infinity,
+              height: 400,
+              child: PhotoView(
+                imageProvider: NetworkImage(imageUrl),
+                backgroundDecoration: const BoxDecoration(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+          ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text("ยืนยันการชำระเงิน")),
-      body:
-          payments.isEmpty
-              ? const Center(child: Text("ไม่มีการชำระเงินรอการยืนยัน"))
-              : ListView.builder(
-                itemCount: payments.length,
-                itemBuilder: (context, index) {
-                  final p = payments[index];
-                  return Card(
-                    margin: const EdgeInsets.all(8),
-                    child: ListTile(
-                      title: Text("OrderNo: ${p['orderNo']}"),
-                      subtitle: Text("จำนวนเงิน: ${p['totalCost']} บาท"),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.check, color: Colors.green),
-                            onPressed: () => confirmPayment(p['paymentNo']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.cancel, color: Colors.red),
-                            onPressed: () => cancelPayment(p['paymentNo']),
-                          ),
-                        ],
+      appBar: AppBar(
+        title: const Text("ตรวจสอบการชำระเงิน"),
+        backgroundColor: Colors.deepOrange,
+      ),
+      body: FutureBuilder<List<Payment>>(
+        future: futurePayments,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("ไม่มีรายการชำระเงินรอการตรวจสอบ"));
+          }
+
+          final payments = snapshot.data!;
+
+          return ListView(
+            children:
+                payments.map((p) {
+                  if (p.methodName == "CASH") {
+                    // ✅ แสดง CalculateWidget สำหรับ CASH
+                    return CalculateWidget(
+                      payment: p,
+                      onSuccess: refreshPayments, // ✅ เรียก refresh เมื่อสำเร็จ
+                      onTapImage:
+                          p.image != null
+                              ? () => showImageDialog(p.image!)
+                              : null,
+                    );
+                  } else if (p.methodName == "PROMPTPAY") {
+                    // ✅ แสดง Card พร้อมปุ่ม Confirm สำหรับ PromptPay
+                    return Card(
+                      margin: const EdgeInsets.all(8),
+                      child: ListTile(
+                        leading:
+                            p.image != null
+                                ? GestureDetector(
+                                  onTap: () => showImageDialog(p.image!),
+                                  child: Image.network(
+                                    p.image!,
+                                    width: 50,
+                                    height: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                                : const Icon(
+                                  Icons.receipt,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                        title: Text("Payment #${p.paymentNo} - ${p.status}"),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Order No: ${p.orderNo} | Table: ${p.tableNo}",
+                            ),
+                            Text("Method: ${p.methodName}"),
+                            Text("Total: ${p.totalCost} ฿"),
+                          ],
+                        ),
+                        isThreeLine: true,
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            PaymentService.confirmPayment(p.paymentNo).then((
+                              success,
+                            ) {
+                              if (success) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "ยืนยัน PromptPay เรียบร้อยแล้ว ✅",
+                                    ),
+                                  ),
+                                );
+                                refreshPayments(); // ✅ refresh หลังจาก confirm สำเร็จ
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("ยืนยัน PromptPay ล้มเหลว ❌"),
+                                  ),
+                                );
+                              }
+                            });
+                          },
+                          child: const Text("Confirm"),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  } else {
+                    // ✅ สำหรับวิธีอื่น ๆ (เช่น QR, Credit card)
+                    return const SizedBox.shrink();
+                  }
+                }).toList(),
+          );
+        },
+      ),
     );
   }
 }

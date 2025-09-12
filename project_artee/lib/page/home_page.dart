@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage>
     DetailOrderPage(),
     ServeOrderPage(),
     CancelOrderPage(),
-    ConfirmPaymentPage(),
+    PaymentPage(),
     LogoutPage(),
   ];
 
