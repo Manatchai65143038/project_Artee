@@ -13,7 +13,7 @@ class _StaffPageState extends State<StaffPage> {
   List<dynamic> staffs = [];
   bool loading = true;
   String? errorMessage;
-  String? myStaffID; // ✅ เก็บ staffID ที่ login
+  String? myStaffID;
 
   @override
   void initState() {
@@ -21,7 +21,6 @@ class _StaffPageState extends State<StaffPage> {
     loadStaffs();
   }
 
-  /// โหลดข้อมูล Staff + Filter ตาม staffID
   Future<void> loadStaffs() async {
     if (!mounted) return;
     setState(() {
@@ -75,33 +74,79 @@ class _StaffPageState extends State<StaffPage> {
               ? _buildErrorWidget()
               : staffs.isEmpty
               ? _buildEmptyWidget()
-              : _buildStaffList(),
-    );
-  }
-
-  Widget _buildErrorWidget() => Center(child: Text(errorMessage ?? "Error"));
-  Widget _buildEmptyWidget() => const Center(child: Text("ไม่มีข้อมูลพนักงาน"));
-
-  Widget _buildStaffList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: staffs.length,
-      itemBuilder: (context, index) {
-        final staff = staffs[index];
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                staff['image'] != null && staff['image'] != ""
-                    ? staff['image']
-                    : "https://via.placeholder.com/150",
+              : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    for (var staff in staffs)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8.0,
+                            horizontal: 24,
+                          ),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                            shadowColor: Colors.deepOrangeAccent.withOpacity(
+                              0.3,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 20,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage: NetworkImage(
+                                      staff['image'] != null &&
+                                              staff['image'] != ""
+                                          ? staff['image']
+                                          : "https://via.placeholder.com/150",
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    "${staff['name']} ${staff['surname']}",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "${staff['email'] ?? "-"}",
+                                    style: const TextStyle(fontSize: 15),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "${staff['telNo'] ?? "-"}",
+                                    style: const TextStyle(fontSize: 15),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
-            ),
-            title: Text("${staff['name']} ${staff['surname']}"),
-            subtitle: Text(staff['email'] ?? "-"),
-          ),
-        );
-      },
     );
   }
+
+  Widget _buildErrorWidget() =>
+      Center(child: Text(errorMessage ?? "Error loading staff"));
+  Widget _buildEmptyWidget() => const Center(child: Text("ไม่พบข้อมูลพนักงาน"));
 }
