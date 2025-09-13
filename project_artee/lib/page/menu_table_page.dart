@@ -8,7 +8,8 @@ class MenuTablePage extends StatefulWidget {
   State<MenuTablePage> createState() => _MenuTablePageState();
 }
 
-class _MenuTablePageState extends State<MenuTablePage> {
+class _MenuTablePageState extends State<MenuTablePage>
+    with TickerProviderStateMixin {
   List<dynamic> menus = [];
   bool loading = true;
   String? selectedType;
@@ -30,14 +31,18 @@ class _MenuTablePageState extends State<MenuTablePage> {
       setState(() => loading = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ).showSnackBar(SnackBar(content: Text("เกิดข้อผิดพลาด: $e")));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.deepOrange),
+        ),
+      );
     }
 
     final types = menus.map((m) => m['type']?['name']).toSet().toList();
@@ -51,17 +56,28 @@ class _MenuTablePageState extends State<MenuTablePage> {
       appBar: AppBar(
         title: const Text(
           "รายการเมนูอาหาร",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepOrange,
-        elevation: 4,
+        elevation: 6, // เพิ่มความลึกให้ shadow
+        backgroundColor: Colors.deepOrange.shade700,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่างของ AppBar
+          ),
+        ),
+        shadowColor: Colors.deepOrangeAccent.withOpacity(0.4),
       ),
       body: Column(
         children: [
-          // 🥗 Dropdown Filter
+          // 🌿 Dropdown Filter
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.green[50],
@@ -69,39 +85,59 @@ class _MenuTablePageState extends State<MenuTablePage> {
                 border: Border.all(color: Colors.green.shade400, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.green.withOpacity(0.2),
+                    color: Colors.green.withOpacity(0.15),
                     blurRadius: 6,
                     offset: const Offset(0, 3),
                   ),
                 ],
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: DropdownButton<String>(
-                underline: const SizedBox(),
-                isExpanded: true,
-                hint: const Text("เลือกประเภทอาหาร"),
-                value: selectedType,
-                items: [
-                  const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
-                  ...types.map(
-                    (type) =>
-                        DropdownMenuItem(value: type, child: Text(type ?? "-")),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  hint: const Text(
+                    "เลือกประเภทอาหาร",
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                  });
-                },
+                  value: selectedType,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.green,
+                  ),
+                  dropdownColor: Colors.green[50],
+                  items: [
+                    const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
+                    ...types.map(
+                      (type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(
+                          type ?? "-",
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    setState(() => selectedType = value);
+                  },
+                ),
               ),
             ),
           ),
 
-          // 📋 ตารางเมนู
+          // 📋 ตารางเมนู + Animation
           Expanded(
             child:
                 filteredMenus.isEmpty
-                    ? const Center(child: Text("ไม่พบเมนูในประเภทนี้"))
+                    ? const Center(
+                      child: Text(
+                        "ไม่พบเมนูในประเภทนี้",
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                    )
                     : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: ConstrainedBox(
@@ -111,7 +147,7 @@ class _MenuTablePageState extends State<MenuTablePage> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: DataTable(
-                            columnSpacing: 20,
+                            columnSpacing: 24,
                             headingRowColor: MaterialStateProperty.all(
                               Colors.green.shade200,
                             ),
@@ -119,12 +155,8 @@ class _MenuTablePageState extends State<MenuTablePage> {
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
-                            dataRowColor: MaterialStateProperty.resolveWith(
-                              (states) =>
-                                  states.contains(MaterialState.selected)
-                                      ? Colors.orange.shade100
-                                      : Colors.white,
-                            ),
+                            dataRowHeight: 70,
+                            dividerThickness: 1,
                             border: TableBorder.all(
                               color: Colors.green.shade100,
                               width: 1,
@@ -136,93 +168,101 @@ class _MenuTablePageState extends State<MenuTablePage> {
                               DataColumn(label: Text("สถานะ")),
                               DataColumn(label: Text("ประเภท")),
                             ],
-                            rows:
-                                filteredMenus.map((menu) {
-                                  return DataRow(
-                                    cells: [
-                                      DataCell(
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
+                            rows: List.generate(filteredMenus.length, (index) {
+                              final menu = filteredMenus[index];
+                              return DataRow(
+                                cells: [
+                                  DataCell(
+                                    TweenAnimationBuilder<double>(
+                                      tween: Tween(begin: 50, end: 0),
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 100),
+                                      ),
+                                      builder: (context, value, child) {
+                                        return Transform.translate(
+                                          offset: Offset(value, 0),
+                                          child: Opacity(
+                                            opacity: 1 - (value / 50),
+                                            child: child,
                                           ),
-                                          child: Image.network(
-                                            menu['image'] ?? "",
-                                            width: 60,
-                                            height: 60,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (
-                                                  context,
-                                                  error,
-                                                  stack,
-                                                ) => Container(
-                                                  width: 60,
-                                                  height: 60,
-                                                  color: Colors.green.shade50,
-                                                  child: const Icon(
-                                                    Icons.fastfood,
-                                                    color: Colors.deepOrange,
+                                        );
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          menu['image'] ?? "",
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stack) =>
+                                                  Container(
+                                                    width: 60,
+                                                    height: 60,
+                                                    color: Colors.green.shade50,
+                                                    child: const Icon(
+                                                      Icons.fastfood,
+                                                      color: Colors.deepOrange,
+                                                    ),
                                                   ),
-                                                ),
-                                          ),
                                         ),
                                       ),
-                                      DataCell(
-                                        Text(
-                                          menu['name'] ?? "",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.deepOrange,
-                                          ),
-                                        ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      menu['name'] ?? "",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.deepOrange,
                                       ),
-                                      DataCell(Text("${menu['price']} ฿")),
-                                      DataCell(
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                (menu['isAvailable'] == true)
-                                                    ? Colors.green
-                                                    : Colors.deepOrange,
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                    ),
+                                  ),
+                                  DataCell(Text("${menu['price']} ฿")),
+                                  DataCell(
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            menu['isAvailable'] == true
+                                                ? Colors.green
+                                                : Colors.deepOrange,
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
                                             ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
-                                                ),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
                                           ),
-                                          child: Text(
-                                            (menu['isAvailable'] == true)
-                                                ? "พร้อมขาย"
-                                                : "ไม่พร้อมขาย",
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        menu['isAvailable'] == true
+                                            ? "พร้อมขาย"
+                                            : "ไม่พร้อมขาย",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      DataCell(
-                                        Text(
-                                          menu['type']?['name'] ?? "-",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Text(
+                                      menu['type']?['name'] ?? "-",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ],
-                                  );
-                                }).toList(),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                           ),
                         ),
                       ),

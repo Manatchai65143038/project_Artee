@@ -17,8 +17,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final TabController _tabController;
 
   final List<String> _tabTitles = [
@@ -74,15 +73,15 @@ class _HomePageState extends State<HomePage>
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 600;
 
-    const Color primaryGreen = Color(0xFF4CAF50); // สีเขียวหลัก
-    const Color secondaryOrange = Color(0xFFFF9800); // สีส้มรอง
+    const Color primaryGreen = Color(0xFF4CAF50);
+    const Color secondaryOrange = Color(0xFFFF9800);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.orange[50],
-        elevation: 3,
-        title: const AnimatedTitle(), // ✅ ใช้ Title แบบมีอนิเมชัน + Shimmer
+        backgroundColor: Colors.orange[50]?.withOpacity(0.9),
+        elevation: 2,
+        title: const AnimatedTitle(),
         centerTitle: true,
         iconTheme: const IconThemeData(color: primaryGreen),
         bottom:
@@ -106,10 +105,7 @@ class _HomePageState extends State<HomePage>
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFE8F5E9),
-              Color(0xFFFFF3E0),
-            ], // เขียวอ่อน -> ส้มอ่อน
+            colors: [Color(0xFFE8F5E9), Color(0xFFFFF3E0)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -181,7 +177,7 @@ class _HomePageState extends State<HomePage>
   }
 }
 
-// ✅ Title แบบมีอนิเมชัน + Gradient + Shimmer Loop
+// ✅ Animated Shimmer + Scale + Fade
 class AnimatedTitle extends StatefulWidget {
   const AnimatedTitle({super.key});
 
@@ -201,7 +197,7 @@ class _AnimatedTitleState extends State<AnimatedTitle>
   void initState() {
     super.initState();
 
-    // Fade + Scale animation
+    // Scale + Fade
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -219,7 +215,7 @@ class _AnimatedTitleState extends State<AnimatedTitle>
 
     _controller.forward();
 
-    // Shimmer animation (วนตลอดเวลา)
+    // Shimmer Loop
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -246,9 +242,9 @@ class _AnimatedTitleState extends State<AnimatedTitle>
               shaderCallback: (bounds) {
                 return LinearGradient(
                   colors: const [
-                    Color(0xFF4CAF50), // เขียว
-                    Color(0xFFFF9800), // ส้ม
-                    Color(0xFF4CAF50), // เขียว (กลับมา)
+                    Color(0xFF4CAF50),
+                    Color(0xFFFF9800),
+                    Color(0xFF4CAF50),
                   ],
                   stops: [
                     (_shimmerController.value - 0.3).clamp(0.0, 1.0),
@@ -262,9 +258,10 @@ class _AnimatedTitleState extends State<AnimatedTitle>
               child: const Text(
                 "Atree Restaurant",
                 style: TextStyle(
-                  color: Colors.white, // ต้องเป็นสีขาวเพื่อให้ Shader ทำงาน
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                  fontSize: 26,
+                  letterSpacing: 1.2,
                 ),
               ),
             );
