@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_artee/services/menu_api.dart';
 
-// ✅ โทนส้ม + เขียว สดชื่น
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -12,7 +11,7 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   List<dynamic> menus = [];
   bool loading = true;
-  String? selectedType; // ✅ ต้องเป็น nullable
+  String? selectedType;
 
   @override
   void initState() {
@@ -61,18 +60,16 @@ class _MenuPageState extends State<MenuPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // ✅ ดึงประเภทเมนูทั้งหมด
     final menuTypes =
         menus.map((m) => m['type']?['name'] ?? "").toSet().toList();
 
-    // ✅ กรองเมนูตามประเภทที่เลือก
     final filteredMenus =
         selectedType == null
             ? menus
             : menus.where((m) => m['type']?['name'] == selectedType).toList();
 
     return Scaffold(
-      backgroundColor: Colors.orange[50], // ✅ พื้นหลังส้มอ่อน
+      backgroundColor: Colors.orange[50],
       appBar: AppBar(
         title: const Text(
           "เมนูอาหาร",
@@ -80,41 +77,60 @@ class _MenuPageState extends State<MenuPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.deepOrange, // ✅ ส้มเข้ม
+        backgroundColor: Colors.deepOrange,
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
             children: [
-              // ✅ ฟิลเตอร์ประเภทอาหาร
+              // 🥗 ฟิลเตอร์ประเภทอาหาร
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: DropdownButton<String?>(
-                  isExpanded: true,
-                  hint: const Text("เลือกประเภทอาหาร"),
-                  value: selectedType,
-                  items: [
-                    const DropdownMenuItem<String?>(
-                      value: null,
-                      child: Text("ทั้งหมด"),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.green.shade400,
+                      width: 1.2,
                     ),
-                    ...menuTypes.map(
-                      (type) => DropdownMenuItem<String?>(
-                        value: type,
-                        child: Text(type),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.15),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
                       ),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value;
-                    });
-                  },
+                    ],
+                  ),
+                  child: DropdownButton<String?>(
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    hint: const Text("เลือกประเภทอาหาร"),
+                    value: selectedType,
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text("ทั้งหมด"),
+                      ),
+                      ...menuTypes.map(
+                        (type) => DropdownMenuItem<String?>(
+                          value: type,
+                          child: Text(type),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedType = value;
+                      });
+                    },
+                  ),
                 ),
               ),
 
-              // ✅ แสดงรายการเมนู
+              // 📋 รายการเมนู
               Expanded(
                 child:
                     filteredMenus.isEmpty
@@ -133,8 +149,8 @@ class _MenuPageState extends State<MenuPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              elevation: 5,
-                              shadowColor: Colors.green.withOpacity(0.3),
+                              elevation: 6,
+                              shadowColor: Colors.green.withOpacity(0.25),
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: ListTile(
                                 contentPadding: const EdgeInsets.all(12),
@@ -178,7 +194,7 @@ class _MenuPageState extends State<MenuPage> {
                                   ),
                                 ),
                                 trailing: Switch(
-                                  activeColor: Colors.blue,
+                                  activeColor: Colors.green,
                                   value: menu['isAvailable'] == true,
                                   onChanged:
                                       (value) => toggleAvailability(
