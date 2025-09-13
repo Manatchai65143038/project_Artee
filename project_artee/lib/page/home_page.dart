@@ -80,15 +80,9 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white.withOpacity(0.9),
+        backgroundColor: Colors.orange[50],
         elevation: 3,
-        title: const Text(
-          "Atree",
-          style: TextStyle(
-            color: primaryGreen,
-            fontWeight: FontWeight.bold,
-          ), // เขียว
-        ),
+        title: const AnimatedTitle(), // ✅ ใช้ Title แบบมีอนิเมชัน + Shimmer
         centerTitle: true,
         iconTheme: const IconThemeData(color: primaryGreen),
         bottom:
@@ -125,9 +119,8 @@ class _HomePageState extends State<HomePage>
               isDesktop
                   ? Row(
                     children: [
-                      // ✅ จำกัดความกว้าง NavigationRail ไม่ให้บานเกิน
                       SizedBox(
-                        width: 72, // กำหนดความกว้างตายตัว
+                        width: 72,
                         child: SingleChildScrollView(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -182,6 +175,100 @@ class _HomePageState extends State<HomePage>
                       children: _pages,
                     ),
                   ),
+        ),
+      ),
+    );
+  }
+}
+
+// ✅ Title แบบมีอนิเมชัน + Gradient + Shimmer Loop
+class AnimatedTitle extends StatefulWidget {
+  const AnimatedTitle({super.key});
+
+  @override
+  State<AnimatedTitle> createState() => _AnimatedTitleState();
+}
+
+class _AnimatedTitleState extends State<AnimatedTitle>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scale;
+  late Animation<double> _fade;
+
+  late AnimationController _shimmerController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fade + Scale animation
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _scale = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+
+    _fade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+
+    _controller.forward();
+
+    // Shimmer animation (วนตลอดเวลา)
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _shimmerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: FadeTransition(
+        opacity: _fade,
+        child: AnimatedBuilder(
+          animation: _shimmerController,
+          builder: (context, child) {
+            return ShaderMask(
+              shaderCallback: (bounds) {
+                return LinearGradient(
+                  colors: const [
+                    Color(0xFF4CAF50), // เขียว
+                    Color(0xFFFF9800), // ส้ม
+                    Color(0xFF4CAF50), // เขียว (กลับมา)
+                  ],
+                  stops: [
+                    (_shimmerController.value - 0.3).clamp(0.0, 1.0),
+                    _shimmerController.value,
+                    (_shimmerController.value + 0.3).clamp(0.0, 1.0),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds);
+              },
+              child: const Text(
+                "Atree Restaurant",
+                style: TextStyle(
+                  color: Colors.white, // ต้องเป็นสีขาวเพื่อให้ Shader ทำงาน
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
