@@ -49,7 +49,16 @@ class _PaymentPageState extends State<PaymentPage> {
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
-        title: const Text("ตรวจสอบการชำระเงิน"),
+        title: Center(
+          child: const Text(
+            "ตรวจสอบการชำระเงิน",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
         backgroundColor: Colors.deepOrange,
       ),
       body: FutureBuilder<List<Payment>>(

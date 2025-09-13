@@ -96,7 +96,7 @@ class _LogoutPageState extends State<LogoutPage> {
       backgroundColor: Colors.orange.shade50,
       appBar: AppBar(
         title: const Text(
-          "ข้อมูลพนักงาน",
+          "ออกจากระบบ",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
