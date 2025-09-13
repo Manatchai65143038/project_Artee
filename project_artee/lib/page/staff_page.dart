@@ -60,7 +60,7 @@ class _StaffPageState extends State<StaffPage> {
       backgroundColor: Colors.orange.shade50,
       appBar: AppBar(
         title: const Text(
-          "Staff Management",
+          "ข้อมูลพนักงาน",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
