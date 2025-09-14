@@ -47,7 +47,7 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
   @override
   Widget build(BuildContext context) {
     // ดึงประเภทเมนูทั้งหมดจาก currentOrders
-    final types = currentOrders.map((o) => o.menuType).toSet().toList();
+    final menuTypes = currentOrders.map((o) => o.menuType).toSet().toList();
 
     // กรองออร์เดอร์ตามประเภทที่เลือก
     final filteredOrders =
@@ -56,7 +56,7 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
             : currentOrders.where((o) => o.menuType == selectedType).toList();
 
     return Scaffold(
-      backgroundColor: Colors.orange[50], // พื้นหลังอ่อน
+      backgroundColor: Colors.orange[50],
       appBar: AppBar(
         backgroundColor: Colors.deepOrange.shade700,
         title: const Text(
@@ -66,33 +66,68 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
         centerTitle: true,
         elevation: 6,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20), // โค้งด้านล่าง
-          ),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
       ),
       body: Column(
         children: [
-          // Dropdown ฟิลเตอร์ประเภทอาหาร
-          if (types.isNotEmpty)
+          // Dropdown ฟิลเตอร์ประเภทอาหาร (ปรับสไตล์เหมือน DetailOrderPage)
+          if (menuTypes.isNotEmpty)
+            // Dropdown ฟิลเตอร์แบบ Card สีเขียว
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: const Text("เลือกประเภทอาหาร"),
-                value: selectedType,
-                items: [
-                  const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
-                  ...types.map(
-                    (type) =>
-                        DropdownMenuItem(value: type, child: Text(type ?? "-")),
+              child: Card(
+                color: Colors.green[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
                   ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                  });
-                },
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      isExpanded: true,
+                      hint: const Text(
+                        "เลือกประเภทอาหาร",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      value: selectedType,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.green,
+                      ),
+                      dropdownColor: Colors.green[50],
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text("ทั้งหมด"),
+                        ),
+                        ...menuTypes.map(
+                          (type) => DropdownMenuItem<String?>(
+                            value: type,
+                            child: Text(
+                              type ?? "-",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedType = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
 
@@ -180,7 +215,14 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
                                             Text(order.tableNo.toString()),
                                           ),
                                           DataCell(
-                                            Text(order.description ?? ""),
+                                            SizedBox(
+                                              width: 200,
+                                              child: Text(
+                                                order.description ?? "",
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                              ),
+                                            ),
                                           ),
                                           DataCell(Text(order.place ?? "")),
                                           DataCell(

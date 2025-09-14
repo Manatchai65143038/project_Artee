@@ -26,7 +26,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
       final orders = await futureOrders;
       if (!mounted) return;
       setState(() {
-        // Filter เฉพาะ trackOrderID = 1
         currentOrders = orders.where((o) => o.trackOrderID == 1).toList();
       });
     } catch (e) {
@@ -63,60 +62,80 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ดึงประเภทเมนูที่มีใน currentOrders
-    final types = currentOrders.map((o) => o.menuType).toSet().toList();
-
-    // กรองออร์เดอร์ตามประเภทที่เลือก
+    final menuTypes = currentOrders.map((o) => o.menuType).toSet().toList();
     final filteredOrders =
         selectedType == null
             ? currentOrders
             : currentOrders.where((o) => o.menuType == selectedType).toList();
 
     return Scaffold(
-      backgroundColor: Colors.orange[50], // พื้นหลังอ่อน
+      backgroundColor: Colors.orange[50],
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange.shade700,
+        backgroundColor: Colors.deepOrange,
         title: const Text(
           "ออเดอร์ของลูกค้า",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        elevation: 6,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20), // โค้งด้านล่าง
-          ),
-        ),
       ),
       body: Column(
         children: [
-          // Dropdown ฟิลเตอร์ประเภทอาหาร
-          if (types.isNotEmpty)
+          if (menuTypes.isNotEmpty)
+            // Dropdown ฟิลเตอร์แบบ Card สีเขียว
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: "เลือกประเภทอาหาร",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+              child: Card(
+                color: Colors.green[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      isExpanded: true,
+                      hint: const Text(
+                        "เลือกประเภทอาหาร",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      value: selectedType,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.green,
+                      ),
+                      dropdownColor: Colors.green[50],
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text("ทั้งหมด"),
+                        ),
+                        ...menuTypes.map(
+                          (type) => DropdownMenuItem<String?>(
+                            value: type,
+                            child: Text(
+                              type ?? "-",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedType = value;
+                        });
+                      },
+                    ),
                   ),
                 ),
-                value: selectedType,
-                items: [
-                  const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
-                  ...types.map(
-                    (type) =>
-                        DropdownMenuItem(value: type, child: Text(type ?? "-")),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                  });
-                },
               ),
             ),
 
@@ -239,10 +258,6 @@ class _DetailOrderPageState extends State<DetailOrderPage> {
                                                       horizontal: 12,
                                                       vertical: 8,
                                                     ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
                                               ),
                                               onPressed:
                                                   () => _acceptOrder(order),

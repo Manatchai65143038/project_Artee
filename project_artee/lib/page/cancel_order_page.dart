@@ -56,8 +56,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
                     children: [
                       const Text("เลือกเหตุผลการยกเลิก:"),
                       const SizedBox(height: 8),
-
-                      // ✅ Checkbox เหตุผลสำเร็จรูป
                       ...cancelReasons.map((reason) {
                         return CheckboxListTile(
                           value: selectedReasons.contains(reason),
@@ -74,7 +72,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
                           },
                         );
                       }).toList(),
-
                       const Divider(),
                       const Text("เหตุผลเพิ่มเติม:"),
                       const SizedBox(height: 8),
@@ -109,7 +106,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
 
     if (confirm != true) return;
 
-    // ✅ รวมเหตุผลจาก checkbox + textfield
     final description = [
       ...selectedReasons,
       descriptionController.text.trim(),
@@ -122,7 +118,6 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
       return;
     }
 
-    // เรียก cancelOrder service
     bool success = await DetailOrderService.cancelOrder(
       detailNo: order.detailNo,
       orderNo: order.orderNo,
@@ -148,8 +143,7 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ดึงประเภทเมนูทั้งหมดจาก currentOrders
-    final types = currentOrders.map((o) => o.menuType).toSet().toList();
+    final menuTypes = currentOrders.map((o) => o.menuType).toSet().toList();
 
     // กรองออร์เดอร์ตามประเภทที่เลือก
     final filteredOrders =
@@ -168,37 +162,70 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
         centerTitle: true,
         elevation: 6,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20), // โค้งด้านล่าง
-          ),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
       ),
       body: Column(
         children: [
-          // Dropdown ฟิลเตอร์ประเภทอาหาร
-          if (types.isNotEmpty)
+          if (menuTypes.isNotEmpty)
+            // Dropdown ฟิลเตอร์แบบ Card สีเขียว
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: const Text("เลือกประเภทอาหาร"),
-                value: selectedType,
-                items: [
-                  const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
-                  ...types.map(
-                    (type) =>
-                        DropdownMenuItem(value: type, child: Text(type ?? "-")),
+              child: Card(
+                color: Colors.green[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
                   ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                  });
-                },
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      isExpanded: true,
+                      hint: const Text(
+                        "เลือกประเภทอาหาร",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      value: selectedType,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.green,
+                      ),
+                      dropdownColor: Colors.green[50],
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text("ทั้งหมด"),
+                        ),
+                        ...menuTypes.map(
+                          (type) => DropdownMenuItem<String?>(
+                            value: type,
+                            child: Text(
+                              type ?? "-",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedType = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
 
-          // ตารางออร์เดอร์
           Expanded(
             child:
                 filteredOrders.isEmpty
@@ -249,13 +276,10 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
                                                     height: 50,
                                                     fit: BoxFit.cover,
                                                     errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stack,
-                                                        ) => const Icon(
-                                                          Icons.fastfood,
-                                                        ),
+                                                        (_, __, ___) =>
+                                                            const Icon(
+                                                              Icons.fastfood,
+                                                            ),
                                                   ),
                                                 ),
                                                 const SizedBox(width: 8),

@@ -77,57 +77,59 @@ class _MenuTablePageState extends State<MenuTablePage>
         children: [
           // 🌿 Dropdown Filter
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.green[50],
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              color: Colors.green[50],
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.shade400, width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.green.withOpacity(0.15),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  hint: const Text(
-                    "เลือกประเภทอาหาร",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  value: selectedType,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.green,
-                  ),
-                  dropdownColor: Colors.green[50],
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text("ทั้งหมด")),
-                    ...types.map(
-                      (type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(
-                          type ?? "-",
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    isExpanded: true,
+                    hint: const Text(
+                      "เลือกประเภทอาหาร",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ],
-                  onChanged: (value) {
-                    setState(() => selectedType = value);
-                  },
+                    value: selectedType,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.green,
+                    ),
+                    dropdownColor: Colors.green[50],
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text("ทั้งหมด"),
+                      ),
+                      ...types.map(
+                        (type) => DropdownMenuItem<String?>(
+                          value: type,
+                          child: Text(
+                            type ?? "-",
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedType = value;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
           ),
-
           // 📋 ตารางเมนู + Animation
           Expanded(
             child:

@@ -101,63 +101,59 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
           child: Column(
             children: [
               // Dropdown Filter
+              // Dropdown ฟิลเตอร์แบบ Card สีเขียว
               Padding(
-                padding: const EdgeInsets.all(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.green[50],
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  color: Colors.green[50],
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.green.shade400,
-                      width: 1.2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green.withOpacity(0.15),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String?>(
-                      isExpanded: true,
-                      hint: const Text(
-                        "เลือกประเภทอาหาร",
-                        style: TextStyle(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String?>(
+                        isExpanded: true,
+                        hint: const Text(
+                          "เลือกประเภทอาหาร",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        value: selectedType,
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down,
                           color: Colors.green,
-                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                      value: selectedType,
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.green,
-                      ),
-                      dropdownColor: Colors.green[50],
-                      items: [
-                        const DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text("ทั้งหมด"),
-                        ),
-                        ...menuTypes.map(
-                          (type) => DropdownMenuItem<String?>(
-                            value: type,
-                            child: Text(
-                              type,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
+                        dropdownColor: Colors.green[50],
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text("ทั้งหมด"),
+                          ),
+                          ...menuTypes.map(
+                            (type) => DropdownMenuItem<String?>(
+                              value: type,
+                              child: Text(
+                                type ?? "-",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedType = value;
-                        });
-                      },
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selectedType = value;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ),
