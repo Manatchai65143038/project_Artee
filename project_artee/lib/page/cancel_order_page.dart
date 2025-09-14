@@ -160,12 +160,18 @@ class _CancelOrderPageState extends State<CancelOrderPage> {
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepOrange.shade700,
         title: const Text(
           "จัดการออเดอร์",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        elevation: 6,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
       ),
       body: Column(
         children: [

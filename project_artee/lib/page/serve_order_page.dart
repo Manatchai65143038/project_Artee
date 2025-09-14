@@ -56,14 +56,20 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
             : currentOrders.where((o) => o.menuType == selectedType).toList();
 
     return Scaffold(
-      backgroundColor: Colors.orange[50],
+      backgroundColor: Colors.orange[50], // พื้นหลังอ่อน
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepOrange.shade700,
         title: const Text(
-          "เสริฟ์อาหาร",
+          "เสิร์ฟอาหาร",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        elevation: 6,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -197,6 +203,10 @@ class _ServeOrderPageState extends State<ServeOrderPage> {
                                                       horizontal: 12,
                                                       vertical: 8,
                                                     ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
                                               ),
                                               onPressed:
                                                   () => _serveOrder(order),

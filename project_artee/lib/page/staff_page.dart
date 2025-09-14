@@ -64,8 +64,13 @@ class _StaffPageState extends State<StaffPage> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepOrange,
-        elevation: 4,
+        elevation: 6,
+        backgroundColor: Colors.deepOrange.shade700,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
       ),
       body:
           loading

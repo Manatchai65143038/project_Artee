@@ -97,11 +97,16 @@ class _LogoutPageState extends State<LogoutPage> {
       appBar: AppBar(
         title: const Text(
           "ออกจากระบบ",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepOrange,
-        elevation: 4,
+        backgroundColor: Colors.deepOrange.shade700,
+        elevation: 6,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
       ),
       body:
           loading

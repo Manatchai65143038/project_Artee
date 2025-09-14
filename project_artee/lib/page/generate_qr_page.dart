@@ -81,135 +81,126 @@ class _GenerateQrPageState extends State<GenerateQrPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF6E5), // สีพื้นหลังอ่อน
-      body: Column(
-        children: [
-          // ✅ แถบสีส้ม (Generate Order QR)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            color: Colors.deepOrange,
-            child: const Center(
-              child: Text(
-                "Generate Order QR",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          "Generate Order QR",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+        elevation: 6,
+        backgroundColor: Colors.deepOrange.shade700,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _tableCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: "กรอกหมายเลขโต๊ะ",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 24,
+                        ),
+                      ),
+                      onPressed: _loading ? null : _createOrder,
+                      icon:
+                          _loading
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Icon(Icons.qr_code),
+                      label: const Text("สร้าง QR"),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: _tableCtrl,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: "กรอกหมายเลขโต๊ะ",
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrange,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 24,
-                              ),
-                            ),
-                            onPressed: _loading ? null : _createOrder,
-                            icon:
-                                _loading
-                                    ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : const Icon(Icons.qr_code),
-                            label: const Text("สร้าง QR"),
-                          ),
-                        ],
+            const SizedBox(height: 20),
+
+            if (_qrData.isNotEmpty)
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Screenshot(
+                    controller: _screenshotController,
+                    child: Container(
+                      color: Colors.white,
+                      child: QrImageView(
+                        data: _qrData,
+                        size: 220,
+                        version: QrVersions.auto,
                       ),
                     ),
                   ),
+                ),
+              ),
 
-                  const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-                  if (_qrData.isNotEmpty)
-                    Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Screenshot(
-                          controller: _screenshotController,
-                          child: Container(
-                            color: Colors.white,
-                            child: QrImageView(
-                              data: _qrData,
-                              size: 220,
-                              version: QrVersions.auto,
-                            ),
-                          ),
-                        ),
-                      ),
+            if (_qrData.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
                     ),
-
-                  const SizedBox(height: 20),
-
-                  if (_qrData.isNotEmpty)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: _saveQR,
-                          icon: const Icon(Icons.save),
-                          label: const Text("บันทึก"),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: _shareQR,
-                          icon: const Icon(Icons.share),
-                          label: const Text("แชร์"),
-                        ),
-                      ],
+                    onPressed: _saveQR,
+                    icon: const Icon(Icons.save),
+                    label: const Text("บันทึก"),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                     ),
+                    onPressed: _shareQR,
+                    icon: const Icon(Icons.share),
+                    label: const Text("แชร์"),
+                  ),
                 ],
               ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

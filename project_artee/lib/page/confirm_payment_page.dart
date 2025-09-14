@@ -52,14 +52,17 @@ class _PaymentPageState extends State<PaymentPage> {
         title: Center(
           child: const Text(
             "ตรวจสอบการชำระเงิน",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepOrange.shade700,
+        centerTitle: true,
+        elevation: 6,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่าง
+          ),
+        ),
       ),
       body: FutureBuilder<List<Payment>>(
         future: futurePayments,

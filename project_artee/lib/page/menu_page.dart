@@ -87,8 +87,13 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.deepOrange,
+        elevation: 6, // เพิ่มความลึกให้ shadow
+        backgroundColor: Colors.deepOrange.shade700,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20), // โค้งด้านล่างของ AppBar
+          ),
+        ),
       ),
       body: Center(
         child: ConstrainedBox(
